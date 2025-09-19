@@ -1,4 +1,5 @@
-const CACHE = 'bfgen-v1';
+const CACHE = 'bfgen-v2';  // ← podbita wersja!
+
 const ASSETS = [
   './',
   './index.html',
@@ -8,7 +9,13 @@ const ASSETS = [
   './pliki/tlo.png',
   './pliki/fotoramka.png',
   './pliki/nakladka.png',
-  './pliki/logo.png'
+  './pliki/logo.png',
+
+  // ▼ DODANE FONTY
+  './pliki/fonts/TT-Travels-Next-DemiBold.woff2',
+  './pliki/fonts/TT-Commons-Medium.woff2'
+];
+
 ];
 
 self.addEventListener('install', (e)=>{
@@ -26,3 +33,4 @@ self.addEventListener('fetch', (e)=>{
     caches.match(e.request).then(resp => resp || fetch(e.request))
   );
 });
+
