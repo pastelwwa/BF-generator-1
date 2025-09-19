@@ -256,11 +256,27 @@ function bindUI(){
   }, {passive:false});
 }
 
-// PWA: rejestracja SW
-if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=>navigator.serviceWorker.register('./service-worker.js'));
+async function preload(){
+  try {
+    const base = 'pliki/';
+    [state.tlo, state.mask, state.nakladka, state.logo] = await Promise.all([
+      loadImage(base+'tlo.png'),
+      loadImage(base+'fotoramka.png'),
+      loadImage(base+'nakladka.png'),
+      loadImage(base+'logo.png'),
+    ]);
+
+    // ▼ tu dodajemy ładowanie fontów
+    const f1 = document.fonts.load('60px "TT Travels Next DemiBold"');
+    const f2 = document.fonts.load('30px "TT Commons Medium"');
+    await Promise.all([f1, f2, document.fonts.ready]);
+
+    el('status').textContent = 'Zasoby OK. Wczytaj zdjęcie i kliknij Podgląd.';
+  } catch(e) {
+    el('status').textContent = 'Błąd ładowania zasobów: ' + e;
+  }
 }
 
-preload().then(bindUI);
+
 
 
