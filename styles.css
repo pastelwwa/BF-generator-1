@@ -51,4 +51,88 @@ footer .credit {
   margin-left: auto;  /* dociśnięcie do prawej strony */
   opacity: 0.7;
 }
+/* === MOBILE FIRST / PORTRAIT TUNING === */
+
+/* Przyciski i suwaki – większe „touch targets” */
+@media (max-width: 900px) {
+  main {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+  }
+  header, footer {
+    padding: 10px 12px;
+  }
+
+  /* Podgląd na górze, full width */
+  .preview {
+    order: -1;              /* przenieś podgląd NA GÓRĘ */
+    margin-top: 4px;
+  }
+  #c {
+    width: 100%;
+    height: auto;           /* zachowaj proporcje przy skalowaniu */
+    max-width: 100%;
+    border-radius: 12px;
+  }
+  .preview .wide {
+    width: 100%;
+  }
+
+  /* Panele kontrolne: pełna szerokość, bliżej siebie */
+  .controls .group {
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+  .controls label {
+    margin: 8px 0;
+  }
+  .controls textarea {
+    min-height: 80px;
+    font-size: 16px;              /* iOS: brak auto-zoomu przy inputach */
+  }
+  .controls input[type="range"] {
+    height: 28px;
+  }
+
+  /* Równiutka siatka etykieta + suwak */
+  .controls .group label {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Wiersz zapisu – przyklejony na dole ekranu (nad belką iOS) */
+  .controls .save-row {
+    position: sticky;
+    bottom: 8px;
+    background: linear-gradient(180deg, transparent, var(--bg) 30%);
+    padding-top: 8px;
+    z-index: 10;
+  }
+  .controls .save-row input {
+    font-size: 16px;
+  }
+  .controls .save-row button {
+    width: 40%;
+    min-width: 140px;
+  }
+
+  /* Stopka: status zawija się, podpis i przycisk w jednej linii */
+  footer {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  footer .credit {
+    order: 2;
+    margin-left: 0;
+    width: 100%;
+    text-align: right;
+  }
+}
+
+/* Lekka karta dla podglądu na dużych ekranach zostaje bez zmian */
+
 
