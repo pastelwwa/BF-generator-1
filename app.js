@@ -17,6 +17,12 @@ const state = {
   showGrid: true
 };
 
+// FONTY (Canvas px)
+const FONT1_PX = 60;  // duży ~60pt
+const FONT2_PX = 30;  // mały ~30pt
+const LH1 = Math.round(FONT1_PX * 1.05);
+const LH2 = Math.round(FONT2_PX * 1.15);
+
 function loadImage(src){
   return new Promise((res, rej)=>{
     const i = new Image();
@@ -28,7 +34,6 @@ function loadImage(src){
 
 async function preload(){
   try{
-    // zasoby
     const base = 'pliki/';
     [state.tlo, state.mask, state.nakladka, state.logo] = await Promise.all([
       loadImage(base+'tlo.png'),
@@ -36,6 +41,12 @@ async function preload(){
       loadImage(base+'nakladka.png'),
       loadImage(base+'logo.png'),
     ]);
+
+    // Załaduj fonty i poczekaj
+    const f1 = document.fonts.load(`${FONT1_PX}px "TT Travels Next DemiBold"`);
+    const f2 = document.fonts.load(`${FONT2_PX}px "TT Commons Medium"`);
+    await Promise.all([f1, f2, document.fonts.ready]);
+
     el('status').textContent = 'Zasoby OK. Wczytaj zdjęcie i kliknij Podgląd.';
   }catch(e){
     el('status').textContent = 'Błąd ładowania zasobów: ' + e;
@@ -56,14 +67,12 @@ function drawGrid(){
 }
 
 function applySharpen(srcCanvas, amountPct){
-  // prosta konwolucja (kernel sharpen); amount 0–200%
   const amount = Math.max(0, Math.min(2, amountPct/100));
-  if(amount === 1) return srcCanvas; // 100% = standardowy kernel
+  if(amount === 1) return srcCanvas;
   const w = srcCanvas.width, h = srcCanvas.height;
   const sctx = srcCanvas.getContext('2d');
   const src = sctx.getImageData(0,0,w,h);
   const dst = sctx.createImageData(w,h);
-  // kernel bazowy
   const k = [
      0,        -1*amount, 0,
     -1*amount,  1+4*amount, -1*amount,
@@ -86,7 +95,7 @@ function applySharpen(srcCanvas, amountPct){
         acc += sd[idx + row + 4]*k[8];
         dd[idx] = Math.max(0, Math.min(255, acc));
       }
-      dd[(y*w+x)*4 + 3] = sd[(y*w+x)*4 + 3]; // alfa
+      dd[(y*w+x)*4 + 3] = sd[(y*w+x)*4 + 3];
     }
   }
   sctx.putImageData(dst,0,0);
@@ -96,24 +105,19 @@ function applySharpen(srcCanvas, amountPct){
 function render(){
   if(!state.tlo){ return; }
 
-  // 1) tło
   ctx.clearRect(0,0,W,H);
   ctx.drawImage(state.tlo, 0,0, W,H);
 
-  // 2) warstwa zdjęcia z maską w offscreen canvas
   if(state.img && state.mask){
     const off = document.createElement('canvas');
     off.width = W; off.height = H;
     const octx = off.getContext('2d');
 
-    // korekcje (Canvas 2D filter — Safari wspiera)
     const b = state.bright/100, s = state.sat/100, co = state.cont/100;
     octx.filter = `brightness(${b}) saturate(${s}) contrast(${co})`;
 
-    // rysuj zdjęcie z transformacją (zoom i przesunięcie względem środka maski)
     const scale = state.zoom/100;
     octx.save();
-    // środek całego pola = środek canvasu (maskę mamy tej samej wielkości co cały plik)
     const cx = W/2 + state.offx;
     const cy = H/2 + state.offy;
     const iw = state.img.width * scale;
@@ -121,51 +125,39 @@ function render(){
     octx.drawImage(state.img, cx - iw/2, cy - ih/2, iw, ih);
     octx.restore();
 
-    // przycięcie do maski (destination-in)
     octx.save();
     octx.globalCompositeOperation = 'destination-in';
     octx.drawImage(state.mask, 0,0, W,H);
     octx.restore();
 
-    // ostrość (konwolucja) – jeśli != 100
     const sharpened = (state.sharp===100) ? off : applySharpen(off, state.sharp);
-
-    // wklej na główny
     ctx.drawImage(sharpened, 0,0);
   }
 
-  // 3) nakładka i logo
   if(state.nakladka) ctx.drawImage(state.nakladka, 0,0, W,H);
   if(state.logo)     ctx.drawImage(state.logo,     0,0, W,H);
 
-  // 4) teksty
   ctx.fillStyle = '#fff';
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
 
-  const FONT1_PX = 60;  // ~60 pt
-  const FONT2_PX = 30;  // ~30 pt
-  ctx.font = `${FONT1_PX}px "TT-Travels-DemiBold", Arial, sans-serif`;
-
-  // duży tekst – linie w górę od y=1109
+  // duży tekst (wersaliki) od dołu do góry
+  ctx.font = `${FONT1_PX}px "TT Travels Next DemiBold", Arial, sans-serif`;
   const lines1 = (state.text1 || '').toUpperCase().split('\n');
-  const lh1 = Math.round(FONT1_PX * 1.0);
   for(let i=0;i<lines1.length;i++){
-    const line = lines1[lines1.length-1-i]; // od dołu
-    const y = 1109 - i*lh1;
+    const line = lines1[lines1.length-1-i];
+    const y = 1109 - i*LH1;
     ctx.fillText(line, 70, y);
   }
 
-  // mały tekst – linie w dół od y=1185
-  ctx.font = `${FONT2_PX}px "TT-Commons-Medium", Arial, sans-serif`;
+  // mały tekst od góry w dół
+  ctx.font = `${FONT2_PX}px "TT Commons Medium", Arial, sans-serif`;
   const lines2 = (state.text2 || '').split('\n');
-  const lh2 = Math.round(FONT2_PX * 1.1);
   for(let i=0;i<lines2.length;i++){
-    const y = 1185 + i*lh2;
+    const y = 1185 + i*LH2;
     ctx.fillText(lines2[i], 75, y);
   }
 
-  // 5) siatka podglądu (tylko UI)
   if(state.showGrid) drawGrid();
 }
 
@@ -254,30 +246,53 @@ function bindUI(){
     el('zoom').value = state.zoom;
     render();
   }, {passive:false});
+
+  // DOTYK: DRAG + PINCH
+  let touchDragging=false, startX=0, startY=0, baseOffX=0, baseOffY=0;
+  let pinching=false, startDist=0, baseZoom=100;
+
+  function dist(t1,t2){ return Math.hypot(t2.clientX-t1.clientX, t2.clientY-t1.clientY); }
+
+  c.addEventListener('touchstart', (e)=>{
+    if(e.touches.length===1){
+      touchDragging=true; pinching=false;
+      startX=e.touches[0].clientX; startY=e.touches[0].clientY;
+      baseOffX=state.offx; baseOffY=state.offy;
+    } else if(e.touches.length===2){
+      pinching=true; touchDragging=false;
+      startDist=dist(e.touches[0],e.touches[1]);
+      baseZoom=state.zoom;
+    }
+  }, {passive:true});
+
+  c.addEventListener('touchmove', (e)=>{
+    if(touchDragging && e.touches.length===1){
+      const dxCSS = e.touches[0].clientX - startX;
+      const dyCSS = e.touches[0].clientY - startY;
+      const scaleX = W / c.clientWidth;
+      const scaleY = H / c.clientHeight;
+      state.offx = Math.round(baseOffX + dxCSS*scaleX);
+      state.offy = Math.round(baseOffY + dyCSS*scaleY);
+      el('offx').value=state.offx; el('offy').value=state.offy;
+      render();
+    } else if(pinching && e.touches.length===2){
+      const d=dist(e.touches[0],e.touches[1]);
+      const ratio = d/Math.max(1,startDist);
+      state.zoom = Math.max(50, Math.min(300, Math.round(baseZoom*ratio)));
+      el('zoom').value=state.zoom;
+      render();
+    }
+  }, {passive:true});
+
+  window.addEventListener('touchend', ()=>{
+    touchDragging=false;
+    if(c.touches && c.touches?.length <2) pinching=false;
+  }, {passive:true});
 }
 
-async function preload(){
-  try {
-    const base = 'pliki/';
-    [state.tlo, state.mask, state.nakladka, state.logo] = await Promise.all([
-      loadImage(base+'tlo.png'),
-      loadImage(base+'fotoramka.png'),
-      loadImage(base+'nakladka.png'),
-      loadImage(base+'logo.png'),
-    ]);
-
-    // ▼ tu dodajemy ładowanie fontów
-    const f1 = document.fonts.load('60px "TT Travels Next DemiBold"');
-    const f2 = document.fonts.load('30px "TT Commons Medium"');
-    await Promise.all([f1, f2, document.fonts.ready]);
-
-    el('status').textContent = 'Zasoby OK. Wczytaj zdjęcie i kliknij Podgląd.';
-  } catch(e) {
-    el('status').textContent = 'Błąd ładowania zasobów: ' + e;
-  }
+// PWA: rejestracja SW
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>navigator.serviceWorker.register('./service-worker.js'));
 }
 
-
-
-
-
+preload().then(bindUI);
