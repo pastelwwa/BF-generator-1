@@ -149,7 +149,7 @@ function render(){
 
   // duży tekst – linie w górę od y=1109
   const lines1 = (state.text1 || '').toUpperCase().split('\n');
-  const lh1 = Math.round(FONT1_PX * 1.1);
+  const lh1 = Math.round(FONT1_PX * 1.0);
   for(let i=0;i<lines1.length;i++){
     const line = lines1[lines1.length-1-i]; // od dołu
     const y = 1109 - i*lh1;
@@ -159,7 +159,7 @@ function render(){
   // mały tekst – linie w dół od y=1185
   ctx.font = `${FONT2_PX}px "TT-Commons-Medium", Arial, sans-serif`;
   const lines2 = (state.text2 || '').split('\n');
-  const lh2 = Math.round(FONT2_PX * 1.2);
+  const lh2 = Math.round(FONT2_PX * 1.1);
   for(let i=0;i<lines2.length;i++){
     const y = 1185 + i*lh2;
     ctx.fillText(lines2[i], 75, y);
@@ -276,6 +276,7 @@ async function preload(){
     el('status').textContent = 'Błąd ładowania zasobów: ' + e;
   }
 }
+
 
 
 
