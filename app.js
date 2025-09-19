@@ -145,7 +145,7 @@ function render(){
 
   const FONT1_PX = 80;  // ~60 pt
   const FONT2_PX = 40;  // ~30 pt
-  ctx.font = `${FONT1_PX}px "TT Travels DemiBold", Arial, sans-serif`;
+  ctx.font = `${FONT1_PX}px "TT-Travels-DemiBold", Arial, sans-serif`;
 
   // duży tekst – linie w górę od y=1109
   const lines1 = (state.text1 || '').toUpperCase().split('\n');
@@ -157,7 +157,7 @@ function render(){
   }
 
   // mały tekst – linie w dół od y=1185
-  ctx.font = `${FONT2_PX}px "TT Commons Medium", Arial, sans-serif`;
+  ctx.font = `${FONT2_PX}px "TT-Commons-Medium", Arial, sans-serif`;
   const lines2 = (state.text2 || '').split('\n');
   const lh2 = Math.round(FONT2_PX * 1.2);
   for(let i=0;i<lines2.length;i++){
@@ -262,3 +262,4 @@ if('serviceWorker' in navigator){
 }
 
 preload().then(bindUI);
+
