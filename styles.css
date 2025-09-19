@@ -1,78 +1,210 @@
-@font-face {
-  font-family: "TT Travels DemiBold";
-  src: url("pliki/fonts/TT-Travels-Next-DemiBold.woff2") format("woff2");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
+/* === RESET / BAZA === */
+:root {
+  --bg: #1e1e1e;
+  --fg: #f5f5f5;
+  --muted: #aaa;
+  --accent: #4cafef;
+  --danger: #e74c3c;
 }
 
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
 }
-@font-face {
-  font-family: "TT Commons Medium";
-  src: url("pliki/fonts/TT-Commons-Medium.woff2") format("woff2");
-  font-weight: 500; font-style: normal; font-display: swap;
+
+button, input, textarea {
+  font-family: inherit;
 }
 
-:root{
-  --bg:#1f2937; --card:#374151; --muted:#9ca3af; --fg:#e5e7eb; --accent:#111827;
+/* === HEADER / FOOTER === */
+header, footer {
+  background: #111;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-*{box-sizing:border-box}
-body{margin:0;font:14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;background:var(--bg);color:var(--fg)}
-h1{margin:0;font-size:18px}
-h2{margin:0 0 8px 0;font-size:14px;opacity:.9}
 
-header, footer{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--card);border-bottom:1px solid #0003}
-footer{border-top:1px solid #0003;border-bottom:none;justify-content:space-between}
+header h1 {
+  font-size: 18px;
+  margin: 0;
+}
 
-.file-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.file-row label{opacity:.9}
-
-main{display:grid;grid-template-columns: 420px 1fr;gap:14px;padding:14px}
-.controls .group{background:var(--card);border:1px solid #0003;border-radius:10px;padding:12px;margin-bottom:12px}
-.controls label{display:block;margin:10px 0;color:var(--fg)}
-.controls input[type="range"]{width:100%}
-.controls textarea{width:100%;background:#fff;color:#111;border-radius:8px;border:none;padding:8px}
-.controls .save-row{display:flex;gap:8px;align-items:center}
-.controls .save-row input{flex:1;min-width:0;background:#fff;color:#111;border:none;border-radius:8px;padding:8px}
-
-.preview{display:flex;flex-direction:column;gap:10px;align-items:center}
-#c{width:540.5px;height:723.5px;background:#222;border:1px solid #0006;border-radius:12px;box-shadow:0 4px 20px #0006}
-
-button{background:#0ea5e9;color:white;border:none;border-radius:8px;padding:8px 12px;cursor:pointer}
-button.wide{width:100%}
-button.ghost{background:transparent;color:var(--muted);border:1px dashed #fff2}
-button.tiny{padding:4px 8px;font-size:12px}
-
-.checkbox{display:flex;align-items:center;gap:8px}
-
-footer .credit {
+footer {
   font-size: 12px;
   color: var(--muted);
-  margin-left: auto;  /* dociśnięcie do prawej strony */
+  gap: 12px;
+}
+
+footer .credit {
+  margin-left: auto;
   opacity: 0.7;
 }
-/* === MOBILE FIRST / PORTRAIT TUNING === */
 
-/* Przyciski i suwaki – większe „touch targets” */
+/* === MAIN LAYOUT (DESKTOP) === */
+main {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 20px;
+  height: calc(100% - 80px);
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+}
+
+.controls .group {
+  background: #2a2a2a;
+  padding: 12px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.controls .group h2 {
+  margin: 0 0 6px;
+  font-size: 14px;
+  color: var(--accent);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.controls label {
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+
+.controls input[type="range"] {
+  flex: 1;
+}
+
+.controls textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 60px;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: #111;
+  color: var(--fg);
+  font-size: 14px;
+}
+
+/* === BUTTONS === */
+button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: #379fdc;
+}
+
+button.danger {
+  background: var(--danger);
+}
+button.danger:hover {
+  background: #c0392b;
+}
+
+button.ghost {
+  background: transparent;
+  color: var(--muted);
+  border: 1px dashed var(--muted);
+}
+button.ghost:hover {
+  border-color: var(--fg);
+  color: var(--fg);
+}
+
+button.tiny {
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+/* === PREVIEW === */
+.preview {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background: #000;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+#c {
+  background: #333;
+  border-radius: 12px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.preview .wide {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* === SAVE ROW (DESKTOP) === */
+.save-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.save-row input {
+  flex: 1;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: #111;
+  color: var(--fg);
+  font-size: 14px;
+}
+
+/* === MOBILE FIRST / PORTRAIT TUNING === */
 @media (max-width: 900px) {
   main {
     display: flex;
     flex-direction: column;
     gap: 12px;
     padding: 12px;
+    height: auto;
   }
+
   header, footer {
     padding: 10px 12px;
   }
 
-  /* Podgląd na górze, full width */
+  /* Podgląd na górze */
   .preview {
-    order: -1;              /* przenieś podgląd NA GÓRĘ */
+    order: -1;
     margin-top: 4px;
+    padding: 4px;
   }
   #c {
     width: 100%;
-    height: auto;           /* zachowaj proporcje przy skalowaniu */
+    height: auto;
     max-width: 100%;
     border-radius: 12px;
   }
@@ -80,7 +212,7 @@ footer .credit {
     width: 100%;
   }
 
-  /* Panele kontrolne: pełna szerokość, bliżej siebie */
+  /* Panele kontrolne pełna szerokość */
   .controls .group {
     padding: 10px;
     margin-bottom: 10px;
@@ -90,7 +222,7 @@ footer .credit {
   }
   .controls textarea {
     min-height: 80px;
-    font-size: 16px;              /* iOS: brak auto-zoomu przy inputach */
+    font-size: 16px; /* iOS: brak auto-zoomu */
   }
   .controls input[type="range"] {
     height: 28px;
@@ -104,7 +236,7 @@ footer .credit {
     gap: 10px;
   }
 
-  /* Wiersz zapisu – przyklejony na dole ekranu (nad belką iOS) */
+  /* Sticky save-row */
   .controls .save-row {
     position: sticky;
     bottom: 8px;
@@ -120,7 +252,7 @@ footer .credit {
     min-width: 140px;
   }
 
-  /* Stopka: status zawija się, podpis i przycisk w jednej linii */
+  /* Stopka */
   footer {
     flex-wrap: wrap;
     gap: 8px;
@@ -132,7 +264,3 @@ footer .credit {
     text-align: right;
   }
 }
-
-/* Lekka karta dla podglądu na dużych ekranach zostaje bez zmian */
-
-
