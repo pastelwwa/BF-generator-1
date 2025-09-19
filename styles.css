@@ -1,7 +1,11 @@
 @font-face {
   font-family: "TT Travels DemiBold";
   src: url("pliki/fonts/TT-Travels-Next-DemiBold.woff2") format("woff2");
-  font-weight: 600; font-style: normal; font-display: swap;
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
 }
 @font-face {
   font-family: "TT Commons Medium";
@@ -47,3 +51,4 @@ footer .credit {
   margin-left: auto;  /* dociśnięcie do prawej strony */
   opacity: 0.7;
 }
+
