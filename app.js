@@ -143,8 +143,8 @@ function render(){
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
 
-  const FONT1_PX = 80;  // ~60 pt
-  const FONT2_PX = 40;  // ~30 pt
+  const FONT1_PX = 60;  // ~60 pt
+  const FONT2_PX = 30;  // ~30 pt
   ctx.font = `${FONT1_PX}px "TT-Travels-DemiBold", Arial, sans-serif`;
 
   // duży tekst – linie w górę od y=1109
@@ -262,4 +262,5 @@ if('serviceWorker' in navigator){
 }
 
 preload().then(bindUI);
+
 
