@@ -6,6 +6,7 @@
   "background_color": "#111827",
   "theme_color": "#111827",
   "icons": [
-    { "src": "pliki/logo.png", "sizes": "512x512", "type": "image/png" }
+    { "src": "pliki/appicon.png", "sizes": "512x512", "type": "image/png" }
   ]
 }
+
