@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>BF Generator (PWA)</title>
+
+  <!-- manifest + PWA meta -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#111827">
+
+  <!-- iOS PWA -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="pliki/logo.png">
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>BF Generator</h1>
+    <div class="file-row">
+      <label>Wybierz zdjęcie:</label>
+      <input id="photoInput" type="file" accept="image/*" />
+      <button id="autoFitBtn">Dopasuj do ramki</button>
+      <button id="resetAllBtn" class="ghost">Reset wszystkiego</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="controls">
+      <div class="group">
+        <h2>Dopasowanie zdjęcia</h2>
+        <label>Zoom (%)<input id="zoom" type="range" min="50" max="300" value="100"></label>
+        <label>Przesunięcie X<input id="offx" type="range" min="-800" max="800" value="0"></label>
+        <label>Przesunięcie Y<input id="offy" type="range" min="-800" max="800" value="0"></label>
+      </div>
+
+      <div class="group">
+        <h2>Korekcje obrazu</h2>
+        <label>Jasność (%)<input id="bright" type="range" min="0" max="200" value="100"></label>
+        <label>Nasycenie (%)<input id="sat" type="range" min="0" max="200" value="100"></label>
+        <label>Kontrast (%)<input id="cont" type="range" min="0" max="200" value="100"></label>
+        <label>Ostrość (%)<input id="sharp" type="range" min="0" max="200" value="100"></label>
+        <button id="resetCorrBtn">Wyzeruj korekcje</button>
+      </div>
+
+      <div class="group">
+        <h2>Tekst</h2>
+        <label>Tekst duży (wersaliki):<textarea id="text1" rows="4"></textarea></label>
+        <label>Tekst mały:<textarea id="text2" rows="4"></textarea></label>
+      </div>
+
+      <div class="group">
+        <label class="checkbox">
+          <input id="showGrid" type="checkbox" checked> Pokaż siatkę 3×3 w podglądzie
+        </label>
+        <div class="save-row">
+          <input id="outname" value="wynik.png"/>
+          <button id="saveBtn">Zapisz PNG</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="preview">
+      <!-- docelowy rozmiar, ale skalujemy w CSS do 50% -->
+      <canvas id="c" width="1081" height="1447" aria-label="Podgląd"></canvas>
+      <button id="renderBtn" class="wide">Podgląd</button>
+    </section>
+  </main>
+
+<footer>
+  <span id="status">Ładowanie zasobów…</span>
+  <span class="credit">Design &amp; code by Jacek M.</span>
+  <button id="checkBtn" class="ghost tiny">Sprawdź zasoby</button>
+</footer>
+
+
+  <script src="app.js"></script>
+</body>
+</html>

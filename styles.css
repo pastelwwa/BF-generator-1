@@ -1,0 +1,49 @@
+@font-face {
+  font-family: "TT Travels DemiBold";
+  src: url("pliki/fonts/TT-Travels-Next-DemiBold.woff2") format("woff2");
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "TT Commons Medium";
+  src: url("pliki/fonts/TT-Commons-Medium.woff2") format("woff2");
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+
+:root{
+  --bg:#1f2937; --card:#374151; --muted:#9ca3af; --fg:#e5e7eb; --accent:#111827;
+}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.4 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;background:var(--bg);color:var(--fg)}
+h1{margin:0;font-size:18px}
+h2{margin:0 0 8px 0;font-size:14px;opacity:.9}
+
+header, footer{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--card);border-bottom:1px solid #0003}
+footer{border-top:1px solid #0003;border-bottom:none;justify-content:space-between}
+
+.file-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.file-row label{opacity:.9}
+
+main{display:grid;grid-template-columns: 420px 1fr;gap:14px;padding:14px}
+.controls .group{background:var(--card);border:1px solid #0003;border-radius:10px;padding:12px;margin-bottom:12px}
+.controls label{display:block;margin:10px 0;color:var(--fg)}
+.controls input[type="range"]{width:100%}
+.controls textarea{width:100%;background:#fff;color:#111;border-radius:8px;border:none;padding:8px}
+.controls .save-row{display:flex;gap:8px;align-items:center}
+.controls .save-row input{flex:1;min-width:0;background:#fff;color:#111;border:none;border-radius:8px;padding:8px}
+
+.preview{display:flex;flex-direction:column;gap:10px;align-items:center}
+#c{width:540.5px;height:723.5px;background:#222;border:1px solid #0006;border-radius:12px;box-shadow:0 4px 20px #0006}
+
+button{background:#0ea5e9;color:white;border:none;border-radius:8px;padding:8px 12px;cursor:pointer}
+button.wide{width:100%}
+button.ghost{background:transparent;color:var(--muted);border:1px dashed #fff2}
+button.tiny{padding:4px 8px;font-size:12px}
+
+.checkbox{display:flex;align-items:center;gap:8px}
+
+footer .credit {
+  font-size: 12px;
+  color: var(--muted);
+  margin-left: auto;  /* dociśnięcie do prawej strony */
+  opacity: 0.7;
+}
