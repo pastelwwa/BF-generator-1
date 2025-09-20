@@ -9,7 +9,7 @@
   <meta name="theme-color" content="#1e1e1e">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="apple-touch-icon" href="pliki/applogo.png">
+  <link rel="apple-touch-icon" href="pliki/appicon.png">
 </head>
 <body>
   <header>
@@ -25,7 +25,6 @@
 
       <div class="group">
         <h2>Dopasowanie i korekcje</h2>
-        <!-- Uwaga: "Zoom (%)" to nadmiar względem pełnego wypełnienia ramki (cover) -->
         <label>Zoom (%) <input type="range" id="zoomExtra" min="0" max="200" value="0"></label>
         <label>Przesunięcie X <input type="range" id="offx" min="-800" max="800" value="0"></label>
         <label>Przesunięcie Y <input type="range" id="offy" min="-800" max="800" value="0"></label>
@@ -70,22 +69,15 @@
   </main>
 
   <footer>
-    <span id="status">Ładowanie zasobów…</span>
+    <span id="status">Ładowanie…</span>
     <span class="credit">Design &amp; code by Jacek M.</span>
     <div class="row">
-      <button id="installBtn" class="ghost tiny" style="display:none">Zainstaluj aplikację</button>
+      <button id="installBtn" class="ghost tiny">Zainstaluj</button>
       <button id="fullscreenBtn" class="ghost tiny">Pełny ekran</button>
-      <button id="checkBtn" class="ghost tiny">Sprawdź zasoby</button>
+      <button id="checkBtn" class="ghost tiny">Sprawdź</button>
     </div>
   </footer>
-
-  <!-- iOS instrukcja instalacji -->
-  <div id="iosTip" class="ios-tip" hidden>
-    Otwórz menu <b>Udostępnij</b> i wybierz <b>Dodaj do ekranu początkowego</b>, aby zainstalować aplikację.
-    <button id="iosTipClose">OK</button>
-  </div>
 
   <script src="app.js"></script>
 </body>
 </html>
-
