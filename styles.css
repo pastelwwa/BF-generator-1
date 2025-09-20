@@ -1,20 +1,3 @@
-/* === FONTY WEBOWE (nazwy plików z myślnikami) === */
-@font-face {
-  font-family: "TT-Travels-Next-DemiBold";
-  src: url("pliki/fonts/TT-Travels-Next-DemiBold.woff2") format("woff2");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "TT-Commons-Medium";
-  src: url("pliki/fonts/TT-Commons-Medium.woff2") format("woff2");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* === RESET / BAZA === */
 :root {
   --bg: #1e1e1e;
   --fg: #f5f5f5;
@@ -36,7 +19,7 @@ button, input, textarea {
   font-family: inherit;
 }
 
-/* === HEADER / FOOTER === */
+/* Header & Footer */
 header, footer {
   background: #111;
   padding: 8px 16px;
@@ -44,12 +27,13 @@ header, footer {
   align-items: center;
   justify-content: space-between;
 }
+
 header h1 { font-size: 18px; margin: 0; }
 
 footer { font-size: 12px; color: var(--muted); gap: 12px; }
 footer .credit { margin-left: auto; opacity: 0.7; }
 
-/* === MAIN LAYOUT (DESKTOP) === */
+/* Main Layout */
 main {
   display: grid;
   grid-template-columns: 360px 1fr;
@@ -59,12 +43,7 @@ main {
   box-sizing: border-box;
 }
 
-.controls {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  overflow-y: auto;
-}
+.controls { display: flex; flex-direction: column; gap: 14px; overflow-y: auto; }
 
 .controls .group {
   background: #2a2a2a;
@@ -91,22 +70,30 @@ main {
   gap: 6px;
 }
 
-.controls .row { display: flex; gap: 8px; flex-wrap: wrap; }
-
 .controls input[type="range"] { flex: 1; }
 
 .controls textarea {
-  width: 100%; resize: vertical; min-height: 60px;
-  padding: 6px; border-radius: 6px; border: 1px solid #444;
-  background: #111; color: var(--fg); font-size: 14px;
+  width: 100%;
+  resize: vertical;
+  min-height: 60px;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: #111;
+  color: var(--fg);
+  font-size: 14px;
 }
 
-/* === BUTTONS === */
+/* Buttons */
 button {
-  background: var(--accent); color: #fff;
-  border: none; border-radius: 6px;
-  padding: 8px 12px; font-size: 14px;
-  cursor: pointer; transition: background 0.2s;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
 }
 button:hover { background: #379fdc; }
 button.danger { background: var(--danger); }
@@ -115,76 +102,21 @@ button.ghost { background: transparent; color: var(--muted); border: 1px dashed 
 button.ghost:hover { border-color: var(--fg); color: var(--fg); }
 button.tiny { font-size: 12px; padding: 4px 8px; }
 
-/* === PREVIEW === */
-.preview {
-  display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
-  background: #000; padding: 8px; border-radius: 8px;
-}
-#c {
-  background: #333; border-radius: 12px;
-  max-width: 100%; height: auto; display: block;
-  /* BLOKADA scrollowania/pinch domyślnych gestów przeglądarki */
-  touch-action: none;
-}
+/* Preview */
+.preview { display: flex; flex-direction: column; align-items: center; background: #000; padding: 8px; border-radius: 8px; }
+#c { background: #333; border-radius: 12px; max-width: 100%; height: auto; display: block; }
 .preview .wide { width: 100%; margin-top: 10px; }
 
-/* === SAVE ROW (DESKTOP) === */
-.save-row { display: flex; gap: 8px; align-items: center; }
-.save-row input {
-  flex: 1; padding: 6px; border-radius: 6px; border: 1px solid #444;
-  background: #111; color: var(--fg); font-size: 14px;
-}
-
-/* === MOBILE FIRST / PORTRAIT TUNING === */
-@media (max-width: 900px) {
-  main {
-    display: flex; flex-direction: column; gap: 12px;
-    padding: 12px; height: auto;
-  }
-  header, footer { padding: 10px 12px; }
-
-  /* Podgląd na górze */
-  .preview { order: -1; margin-top: 4px; padding: 4px; }
-  #c { width: 100%; height: auto; max-width: 100%; border-radius: 12px; }
-  .preview .wide { width: 100%; }
-
-  /* Panele kontrolne pełna szerokość */
-  .controls .group { padding: 10px; margin-bottom: 10px; }
-  .controls label { margin: 8px 0; }
-  .controls textarea { min-height: 80px; font-size: 16px; } /* iOS: unikanie auto-zoom */
-  .controls input[type="range"] { height: 28px; }
-
-  /* Równe etykiety i suwaki */
-  .controls .group label {
-    display: grid;
-    grid-template-columns: 120px 1fr;
-    align-items: center; gap: 10px;
-  }
-
-  /* Sticky save-row nad belką iOS */
-  .controls .save-row {
-    position: sticky; bottom: 8px;
-    background: linear-gradient(180deg, transparent, var(--bg) 30%);
-    padding-top: 8px; z-index: 10;
-  }
-  .controls .save-row input { font-size: 16px; }
-  .controls .save-row button { width: 40%; min-width: 140px; }
-
-  /* Stopka */
-  footer { flex-wrap: wrap; gap: 8px; }
-  footer .credit { order: 2; margin-left: 0; width: 100%; text-align: right; }
-}
-.save-row {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-.save-row input { flex: 1; }
+/* Save row */
+.save-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.save-row input { flex: 1; padding: 6px; border-radius: 6px; border: 1px solid #444; background: #111; color: var(--fg); font-size: 14px; }
 .save-row button { flex-shrink: 0; }
 
-footer .row {
-  display: flex;
-  gap: 8px;
-}
+footer .row { display: flex; gap: 8px; }
 
+/* Mobile */
+@media (max-width: 900px) {
+  main { display: flex; flex-direction: column; gap: 12px; padding: 12px; height: auto; }
+  .preview { order: -1; padding: 4px; }
+  #c { width: 100%; height: auto; max-width: 100%; }
+}
