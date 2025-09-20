@@ -1,4 +1,4 @@
-/* font-face – nazwy plików z myślnikami */
+/* webfonty */
 @font-face {
   font-family: "TT-Travels-Next-DemiBold";
   src: url("pliki/fonts/TT-Travels-Next-DemiBold.woff2") format("woff2");
@@ -10,16 +10,19 @@
   font-weight: 500; font-style: normal; font-display: swap;
 }
 
-:root { --bg:#1e1e1e; --fg:#f5f5f5; --muted:#aaa; --accent:#4cafef; --danger:#e74c3c; }
+/* baza */
+:root{--bg:#1e1e1e;--fg:#f5f5f5;--muted:#aaa;--accent:#4cafef;--danger:#e74c3c}
 html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--fg);font-family:"Segoe UI",Roboto,Arial,sans-serif}
 button,input,textarea{font-family:inherit}
 
+/* header/footer */
 header,footer{background:#111;padding:8px 16px;display:flex;align-items:center;justify-content:space-between}
 header h1{font-size:18px;margin:0}
 footer{font-size:12px;color:var(--muted);gap:12px}
 footer .credit{margin-left:auto;opacity:.7}
 footer .row{display:flex;gap:8px}
 
+/* layout */
 main{display:grid;grid-template-columns:360px 1fr;gap:20px;height:calc(100% - 80px);padding:16px;box-sizing:border-box}
 .controls{display:flex;flex-direction:column;gap:14px;overflow-y:auto}
 .controls .group{background:#2a2a2a;padding:12px;border-radius:8px;display:flex;flex-direction:column;gap:8px}
@@ -29,20 +32,24 @@ main{display:grid;grid-template-columns:360px 1fr;gap:20px;height:calc(100% - 80
 .controls textarea{width:100%;resize:vertical;min-height:60px;padding:6px;border-radius:6px;border:1px solid #444;background:#111;color:var(--fg);font-size:14px}
 .controls .row{display:flex;gap:8px;flex-wrap:wrap}
 
+/* przyciski */
 button{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:8px 12px;font-size:14px;cursor:pointer;transition:background .2s}
 button:hover{background:#379fdc}
-button.danger{background:var(--danger)} button.danger:hover{background:#c0392b}
-button.ghost{background:transparent;color:var(--muted);border:1px dashed var(--muted)} button.ghost:hover{border-color:var(--fg);color:var(--fg)}
+button.danger{background:var(--danger)}button.danger:hover{background:#c0392b}
+button.ghost{background:transparent;color:var(--muted);border:1px dashed var(--muted)}button.ghost:hover{border-color:var(--fg);color:var(--fg)}
 button.tiny{font-size:12px;padding:4px 8px}
 
+/* podgląd */
 .preview{display:flex;flex-direction:column;align-items:center;background:#000;padding:8px;border-radius:8px}
-#c{background:#333;border-radius:12px;max-width:100%;height:auto;display:block;touch-action:none} /* blokada scroll gestów */
+#c{background:#333;border-radius:12px;max-width:100%;height:auto;display:block;touch-action:none}
 .preview .wide{width:100%;margin-top:10px}
 
+/* zapis */
 .save-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .save-row input{flex:1;padding:6px;border-radius:6px;border:1px solid #444;background:#111;color:var(--fg);font-size:14px}
 .save-row button{flex-shrink:0}
 
+/* mobile */
 @media (max-width:900px){
   main{display:flex;flex-direction:column;gap:12px;padding:12px;height:auto}
   .preview{order:-1;padding:4px}
@@ -53,7 +60,3 @@ button.tiny{font-size:12px;padding:4px 8px}
   .controls input[type="range"]{height:28px}
   .controls .save-row{position:sticky;bottom:8px;background:linear-gradient(180deg,transparent,var(--bg) 30%);padding-top:8px;z-index:10}
 }
-
-/* iOS instrukcja */
-.ios-tip{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#222;border:1px solid #444;color:#fff;padding:10px 12px;border-radius:10px;max-width:90%;box-shadow:0 6px 24px rgba(0,0,0,.5);display:flex;gap:10px;align-items:center}
-.ios-tip button{background:#444}
