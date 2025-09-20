@@ -17,9 +17,7 @@
   </header>
 
   <main>
-    <!-- PANEL KONTROLI -->
     <div class="controls">
-
       <div class="group">
         <h2>Źródło zdjęcia</h2>
         <input id="photoInput" type="file" accept="image/*">
@@ -27,7 +25,8 @@
 
       <div class="group">
         <h2>Dopasowanie i korekcje</h2>
-        <label>Zoom (%) <input type="range" id="zoom" min="50" max="300" value="100"></label>
+        <!-- Uwaga: "Zoom (%)" to nadmiar względem pełnego wypełnienia ramki (cover) -->
+        <label>Zoom (%) <input type="range" id="zoomExtra" min="0" max="200" value="0"></label>
         <label>Przesunięcie X <input type="range" id="offx" min="-800" max="800" value="0"></label>
         <label>Przesunięcie Y <input type="range" id="offy" min="-800" max="800" value="0"></label>
         <label>Jasność <input type="range" id="bright" min="0" max="200" value="100"></label>
@@ -62,10 +61,8 @@
       </div>
 
       <button id="resetAllBtn" class="danger">Reset wszystkiego</button>
-
     </div>
 
-    <!-- PODGLĄD -->
     <div class="preview">
       <canvas id="c" width="1081" height="1447" aria-label="Podgląd"></canvas>
       <button id="renderBtn" class="wide">Podgląd</button>
@@ -76,10 +73,17 @@
     <span id="status">Ładowanie zasobów…</span>
     <span class="credit">Design &amp; code by Jacek M.</span>
     <div class="row">
+      <button id="installBtn" class="ghost tiny" style="display:none">Zainstaluj aplikację</button>
       <button id="fullscreenBtn" class="ghost tiny">Pełny ekran</button>
       <button id="checkBtn" class="ghost tiny">Sprawdź zasoby</button>
     </div>
   </footer>
+
+  <!-- iOS instrukcja instalacji -->
+  <div id="iosTip" class="ios-tip" hidden>
+    Otwórz menu <b>Udostępnij</b> i wybierz <b>Dodaj do ekranu początkowego</b>, aby zainstalować aplikację.
+    <button id="iosTipClose">OK</button>
+  </div>
 
   <script src="app.js"></script>
 </body>
