@@ -1,4 +1,4 @@
-const CACHE = "bfgen-v5";
+const CACHE = "bfgen-v6";
 const ASSETS = [
   "./",
   "./index.html",
@@ -10,7 +10,8 @@ const ASSETS = [
   "./pliki/nakladka.png",
   "./pliki/logo.png",
   "./pliki/fonts/TT-Travels-Next-DemiBold.woff2",
-  "./pliki/fonts/TT-Commons-Medium.woff2"
+  "./pliki/fonts/TT-Commons-Medium.woff2",
+  "./pliki/appicon.png"
 ];
 
 self.addEventListener("install", e=>{
