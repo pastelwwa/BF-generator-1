@@ -145,7 +145,7 @@ function render(){
   const lines1 = (state.text1 || '').toUpperCase().split('\n');
   for(let i=0;i<lines1.length;i++){
     const line = lines1[lines1.length-1-i];
-    const y = 1109 - i*LH1;
+    const y = 1154 - i*LH1;
     ctx.fillText(line, 70, y);
   }
 
@@ -153,7 +153,7 @@ function render(){
   ctx.font = `${FONT2_PX}px "TT-Commons-Medium", Arial, sans-serif`;
   const lines2 = (state.text2 || '').split('\n');
   for(let i=0;i<lines2.length;i++){
-    const y = 1185 + i*LH2;
+    const y = 1201 + i*LH2;
     ctx.fillText(lines2[i], 75, y);
   }
 
@@ -299,3 +299,4 @@ if('serviceWorker' in navigator){
 }
 
 preload().then(bindUI);
+
