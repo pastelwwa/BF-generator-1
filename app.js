@@ -236,7 +236,6 @@ function bindUI(){
   el('text2').addEventListener('input', e=>{ state.text2=e.target.value; render(); });
   el('showGrid').addEventListener('change', e=>{ state.showGrid=e.target.checked; render(); });
 
-  el('renderBtn').addEventListener('click', render);
   el('savePngBtn').addEventListener('click', ()=>saveImage('png'));
   el('saveJpgBtn').addEventListener('click', ()=>saveImage('jpg'));
 
@@ -388,5 +387,6 @@ window.addEventListener('resize', fitCanvasToViewport);
 window.addEventListener('orientationchange', fitCanvasToViewport);
 // po preload/bindUI na końcu pliku:
 fitCanvasToViewport();
+
 
 
