@@ -1,4 +1,4 @@
-const CACHE = 'bfgen-v2';  // ← podbita wersja!
+const CACHE = 'bfgen-v4';  // podbij wersję przy każdej zmianie assets
 
 const ASSETS = [
   './',
@@ -10,12 +10,9 @@ const ASSETS = [
   './pliki/fotoramka.png',
   './pliki/nakladka.png',
   './pliki/logo.png',
-
-  // ▼ DODANE FONTY
+  // fonty (ważne dla offline)
   './pliki/fonts/TT-Travels-Next-DemiBold.woff2',
   './pliki/fonts/TT-Commons-Medium.woff2'
-];
-
 ];
 
 self.addEventListener('install', (e)=>{
@@ -24,7 +21,9 @@ self.addEventListener('install', (e)=>{
 
 self.addEventListener('activate', (e)=>{
   e.waitUntil(
-    caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))
+    caches.keys().then(keys=>Promise.all(
+      keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))
+    ))
   );
 });
 
@@ -33,4 +32,3 @@ self.addEventListener('fetch', (e)=>{
     caches.match(e.request).then(resp => resp || fetch(e.request))
   );
 });
-
