@@ -1,12 +1,11 @@
 {
-  "name": "BF Generator",
-  "short_name": "BF Gen",
-  "start_url": ".",
+  "name": "Generator zdjęć 1081x1447",
+  "short_name": "BF Generator",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#111827",
-  "theme_color": "#111827",
+  "background_color": "#1e1e1e",
+  "theme_color": "#1e1e1e",
   "icons": [
-    { "src": "pliki/appicon.png", "sizes": "512x512", "type": "image/png" }
+    { "src": "pliki/logo.png", "sizes": "512x512", "type": "image/png" }
   ]
 }
-
