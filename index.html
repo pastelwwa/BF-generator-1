@@ -1,80 +1,81 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>BF Generator (PWA)</title>
-
-  <!-- manifest + PWA meta -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Generator zdjęć 1081x1447</title>
+  <link rel="stylesheet" href="styles.css">
   <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#111827">
-
+  <meta name="theme-color" content="#1e1e1e">
   <!-- iOS PWA -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="pliki/logo.png">
-
-  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header>
-    <h1>BF Generator</h1>
-    <div class="file-row">
-      <label>Wybierz zdjęcie:</label>
-      <input id="photoInput" type="file" accept="image/*" />
-      <button id="autoFitBtn">Dopasuj do ramki</button>
-      <button id="resetAllBtn" class="ghost">Reset wszystkiego</button>
-    </div>
+    <h1>Generator zdjęć 1081×1447</h1>
   </header>
 
   <main>
-    <section class="controls">
+    <!-- PANEL KONTROLI -->
+    <div class="controls">
+
       <div class="group">
-        <h2>Dopasowanie zdjęcia</h2>
-        <label>Zoom (%)<input id="zoom" type="range" min="50" max="300" value="100"></label>
-        <label>Przesunięcie X<input id="offx" type="range" min="-800" max="800" value="0"></label>
-        <label>Przesunięcie Y<input id="offy" type="range" min="-800" max="800" value="0"></label>
+        <h2>Źródło zdjęcia</h2>
+        <input id="photoInput" type="file" accept="image/*">
       </div>
 
       <div class="group">
-        <h2>Korekcje obrazu</h2>
-        <label>Jasność (%)<input id="bright" type="range" min="0" max="200" value="100"></label>
-        <label>Nasycenie (%)<input id="sat" type="range" min="0" max="200" value="100"></label>
-        <label>Kontrast (%)<input id="cont" type="range" min="0" max="200" value="100"></label>
-        <label>Ostrość (%)<input id="sharp" type="range" min="0" max="200" value="100"></label>
-        <button id="resetCorrBtn">Wyzeruj korekcje</button>
+        <h2>Dopasowanie i korekcje</h2>
+        <label>Zoom (%) <input type="range" id="zoom" min="50" max="300" value="100"></label>
+        <label>Przesunięcie X <input type="range" id="offx" min="-800" max="800" value="0"></label>
+        <label>Przesunięcie Y <input type="range" id="offy" min="-800" max="800" value="0"></label>
+        <label>Jasność <input type="range" id="bright" min="0" max="200" value="100"></label>
+        <label>Nasycenie <input type="range" id="sat" min="0" max="200" value="100"></label>
+        <label>Kontrast <input type="range" id="cont" min="0" max="200" value="100"></label>
+        <label>Ostrość <input type="range" id="sharp" min="50" max="150" value="100"></label>
+        <div class="row">
+          <button id="autoFitBtn">Auto dopasuj do ramki</button>
+          <button id="resetCorrBtn" class="ghost">Reset korekcji</button>
+        </div>
       </div>
 
       <div class="group">
         <h2>Tekst</h2>
-        <label>Tekst duży (wersaliki):<textarea id="text1" rows="4"></textarea></label>
-        <label>Tekst mały:<textarea id="text2" rows="4"></textarea></label>
+        <label>Tekst duży (wersaliki):<br>
+          <textarea id="text1" rows="3"></textarea>
+        </label>
+        <label>Tekst mały:<br>
+          <textarea id="text2" rows="3"></textarea>
+        </label>
       </div>
 
       <div class="group">
-        <label class="checkbox">
-          <input id="showGrid" type="checkbox" checked> Pokaż siatkę 3×3 w podglądzie
-        </label>
-        <div class="save-row">
-          <input id="outname" value="wynik.png"/>
-          <button id="saveBtn">Zapisz PNG</button>
-        </div>
+        <label class="checkbox"><input type="checkbox" id="showGrid" checked> Pokaż siatkę 3×3</label>
       </div>
-    </section>
 
-    <section class="preview">
-      <!-- docelowy rozmiar, ale skalujemy w CSS do 50% -->
+      <div class="group save-row">
+        <input id="outname" value="wynik.png">
+        <button id="saveBtn">Zapisz PNG</button>
+      </div>
+
+      <button id="resetAllBtn" class="danger">Reset wszystkiego</button>
+
+    </div>
+
+    <!-- PODGLĄD -->
+    <div class="preview">
       <canvas id="c" width="1081" height="1447" aria-label="Podgląd"></canvas>
       <button id="renderBtn" class="wide">Podgląd</button>
-    </section>
+    </div>
   </main>
 
-<footer>
-  <span id="status">Ładowanie zasobów…</span>
-  <span class="credit">Design &amp; code by Jacek M.</span>
-  <button id="checkBtn" class="ghost tiny">Sprawdź zasoby</button>
-</footer>
-
+  <footer>
+    <span id="status">Ładowanie zasobów…</span>
+    <span class="credit">Design &amp; code by Jacek M.</span>
+    <button id="checkBtn" class="ghost tiny">Sprawdź zasoby</button>
+  </footer>
 
   <script src="app.js"></script>
 </body>
