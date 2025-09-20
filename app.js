@@ -370,3 +370,23 @@ preload().then(bindUI);
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=> navigator.serviceWorker.register('./service-worker.js'));
 }
+
+function fitCanvasToViewport(){
+  const preview = document.querySelector('.preview');
+  const pad = 24; // margines bezpieczeństwa
+  const availW = preview.clientWidth - pad;
+  const headerH = document.querySelector('header').offsetHeight;
+  const footerH = document.querySelector('footer').offsetHeight;
+  const availH = window.innerHeight - headerH - footerH - pad;
+
+  const scale = Math.min(availW / W, availH / H, 1); // nigdy > 1 (bez powiększania)
+  c.style.width  = (W * scale) + 'px';
+  c.style.height = (H * scale) + 'px';
+}
+
+window.addEventListener('resize', fitCanvasToViewport);
+window.addEventListener('orientationchange', fitCanvasToViewport);
+// po preload/bindUI na końcu pliku:
+fitCanvasToViewport();
+
+
