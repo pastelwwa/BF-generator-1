@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#1e1e1e">
-  <!-- iOS PWA -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="pliki/logo.png">
@@ -57,8 +56,9 @@
       </div>
 
       <div class="group save-row">
-        <input id="outname" value="wynik.png">
-        <button id="saveBtn">Zapisz PNG</button>
+        <input id="outname" value="wynik">
+        <button id="savePngBtn">Zapisz PNG</button>
+        <button id="saveJpgBtn" class="ghost">Zapisz JPG</button>
       </div>
 
       <button id="resetAllBtn" class="danger">Reset wszystkiego</button>
@@ -75,11 +75,12 @@
   <footer>
     <span id="status">Ładowanie zasobów…</span>
     <span class="credit">Design &amp; code by Jacek M.</span>
-    <button id="checkBtn" class="ghost tiny">Sprawdź zasoby</button>
+    <div class="row">
+      <button id="fullscreenBtn" class="ghost tiny">Pełny ekran</button>
+      <button id="checkBtn" class="ghost tiny">Sprawdź zasoby</button>
+    </div>
   </footer>
 
   <script src="app.js"></script>
 </body>
 </html>
-
-
