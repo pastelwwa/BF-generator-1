@@ -42,9 +42,9 @@ async function preload(){
       loadImage(base+'logo.png'),
     ]);
 
-    // Załaduj fonty i poczekaj
-    const f1 = document.fonts.load(`${FONT1_PX}px "TT Travels Next DemiBold"`);
-    const f2 = document.fonts.load(`${FONT2_PX}px "TT Commons Medium"`);
+    // Załaduj fonty i poczekaj (używamy nazw rodzin z CSS @font-face)
+    const f1 = document.fonts.load(`${FONT1_PX}px "TT-Travels-Next-DemiBold"`);
+    const f2 = document.fonts.load(`${FONT2_PX}px "TT-Commons-Medium"`);
     await Promise.all([f1, f2, document.fonts.ready]);
 
     el('status').textContent = 'Zasoby OK. Wczytaj zdjęcie i kliknij Podgląd.';
@@ -117,14 +117,13 @@ function render(){
     octx.filter = `brightness(${b}) saturate(${s}) contrast(${co})`;
 
     const scale = state.zoom/100;
-    octx.save();
     const cx = W/2 + state.offx;
     const cy = H/2 + state.offy;
     const iw = state.img.width * scale;
     const ih = state.img.height * scale;
     octx.drawImage(state.img, cx - iw/2, cy - ih/2, iw, ih);
-    octx.restore();
 
+    // maskowanie fotoramką
     octx.save();
     octx.globalCompositeOperation = 'destination-in';
     octx.drawImage(state.mask, 0,0, W,H);
@@ -142,7 +141,7 @@ function render(){
   ctx.textBaseline = 'alphabetic';
 
   // duży tekst (wersaliki) od dołu do góry
-  ctx.font = `${FONT1_PX}px "TT Travels Next DemiBold", Arial, sans-serif`;
+  ctx.font = `${FONT1_PX}px "TT-Travels-Next-DemiBold", Arial, sans-serif`;
   const lines1 = (state.text1 || '').toUpperCase().split('\n');
   for(let i=0;i<lines1.length;i++){
     const line = lines1[lines1.length-1-i];
@@ -151,7 +150,7 @@ function render(){
   }
 
   // mały tekst od góry w dół
-  ctx.font = `${FONT2_PX}px "TT Commons Medium", Arial, sans-serif`;
+  ctx.font = `${FONT2_PX}px "TT-Commons-Medium", Arial, sans-serif`;
   const lines2 = (state.text2 || '').split('\n');
   for(let i=0;i<lines2.length;i++){
     const y = 1185 + i*LH2;
@@ -227,7 +226,7 @@ function bindUI(){
     el('status').textContent = ok ? 'Zasoby OK.' : 'Brakuje zasobów w folderze pliki/';
   });
 
-  // PROSTE PAN/ZOOM MYSZKĄ
+  // === MYSZ: DRAG + SCROLL ZOOM ===
   let dragging=false, sx=0, sy=0, bx=0, by=0;
   c.addEventListener('mousedown', (e)=>{ dragging=true; sx=e.offsetX; sy=e.offsetY; bx=state.offx; by=state.offy; });
   window.addEventListener('mouseup', ()=> dragging=false);
@@ -247,13 +246,15 @@ function bindUI(){
     render();
   }, {passive:false});
 
-  // DOTYK: DRAG + PINCH
+  // === DOTYK: DRAG + PINCH (blokada scrolla strony) ===
   let touchDragging=false, startX=0, startY=0, baseOffX=0, baseOffY=0;
   let pinching=false, startDist=0, baseZoom=100;
 
   function dist(t1,t2){ return Math.hypot(t2.clientX-t1.clientX, t2.clientY-t1.clientY); }
 
   c.addEventListener('touchstart', (e)=>{
+    // zablokuj scroll strony przy dotyku na canvasie
+    e.preventDefault();
     if(e.touches.length===1){
       touchDragging=true; pinching=false;
       startX=e.touches[0].clientX; startY=e.touches[0].clientY;
@@ -263,9 +264,11 @@ function bindUI(){
       startDist=dist(e.touches[0],e.touches[1]);
       baseZoom=state.zoom;
     }
-  }, {passive:true});
+  }, {passive:false});
 
   c.addEventListener('touchmove', (e)=>{
+    // zablokuj scroll/pinch przeglądarki – obsługujemy sami
+    e.preventDefault();
     if(touchDragging && e.touches.length===1){
       const dxCSS = e.touches[0].clientX - startX;
       const dyCSS = e.touches[0].clientY - startY;
@@ -282,12 +285,12 @@ function bindUI(){
       el('zoom').value=state.zoom;
       render();
     }
-  }, {passive:true});
+  }, {passive:false});
 
-  window.addEventListener('touchend', ()=>{
-    touchDragging=false;
-    if(c.touches && c.touches?.length <2) pinching=false;
-  }, {passive:true});
+  c.addEventListener('touchend', (e)=>{
+    e.preventDefault();
+    if(e.touches.length===0){ touchDragging=false; pinching=false; }
+  }, {passive:false});
 }
 
 // PWA: rejestracja SW
