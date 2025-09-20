@@ -300,3 +300,55 @@ if('serviceWorker' in navigator){
 
 preload().then(bindUI);
 
+// ... dotychczasowy kod
+
+function saveImage(type){
+  const nameBase = (el('outname').value || 'wynik').replace(/[^a-zA-Z0-9_.-]/g,'_');
+  const ext = type==='png' ? 'png' : 'jpg';
+  const mime = type==='png' ? 'image/png' : 'image/jpeg';
+  c.toBlob((blob)=>{
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${nameBase}.${ext}`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }, mime, (type==='jpg'?0.9:undefined));
+}
+
+function bindUI(){
+  // ... reszta zdarzeń
+
+  el('autoFitBtn').addEventListener('click', ()=>{
+    state.zoom=100; state.offx=0; state.offy=0;
+    el('zoom').value=100; el('offx').value=0; el('offy').value=0;
+    render();
+  });
+
+  el('rotateBtn').addEventListener('click', ()=>{
+    if(!state.img) return;
+    const off = document.createElement('canvas');
+    off.width = state.img.height;
+    off.height = state.img.width;
+    const octx = off.getContext('2d');
+    octx.translate(off.width/2, off.height/2);
+    octx.rotate(Math.PI/2);
+    octx.drawImage(state.img, -state.img.width/2, -state.img.height/2);
+    const rotated = new Image();
+    rotated.onload = ()=>{ state.img = rotated; render(); };
+    rotated.src = off.toDataURL();
+  });
+
+  el('savePngBtn').addEventListener('click', ()=> saveImage('png'));
+  el('saveJpgBtn').addEventListener('click', ()=> saveImage('jpg'));
+
+  el('fullscreenBtn').addEventListener('click', ()=>{
+    if(!document.fullscreenElement){
+      document.documentElement.requestFullscreen().catch(console.error);
+    } else {
+      document.exitFullscreen();
+    }
+  });
+
+  // ... reszta zdarzeń (reset, render, check etc.)
+}
+
