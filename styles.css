@@ -174,3 +174,17 @@ button.tiny { font-size: 12px; padding: 4px 8px; }
   footer { flex-wrap: wrap; gap: 8px; }
   footer .credit { order: 2; margin-left: 0; width: 100%; text-align: right; }
 }
+.save-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.save-row input { flex: 1; }
+.save-row button { flex-shrink: 0; }
+
+footer .row {
+  display: flex;
+  gap: 8px;
+}
+
