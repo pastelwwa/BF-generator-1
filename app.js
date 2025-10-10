@@ -11,37 +11,36 @@ const LH1 = Math.round(FONT1_PX * 1.05);
 const LH2 = Math.round(FONT2_PX * 1.15);
 const LH3 = Math.round(FONT3_PX * 1.15);
 
-// --- Parametr layoutu ---
+// --- Parametr layoutu + nagłówek ---
 const params = new URLSearchParams(location.search);
 const LAYOUT = (params.get('layout') || 'D').toUpperCase();
-document.getElementById('layoutTitle').textContent = `Generator (layout ${LAYOUT})`;
+const layoutTitle = document.getElementById('layoutTitle');
+layoutTitle.textContent = (LAYOUT === 'M') ? 'Generator z małym zdjęciem' : 'Generator z dużym zdjęciem';
 if(LAYOUT === 'M') document.getElementById('smallTextRow').style.display = '';
 
 // --- Stan aplikacji ---
 const state = {
-  ramka:null, nakladka:null, napis:null, // warstwy
-  img:null, imgAngle:0,                   // źródło
-  baseScale:1, zoomExtra:0, offx:0, offy:0, // dopasowanie
-  bright:100, sat:100, cont:100, sharp:100, // korekcje
-  bgColor:'#FF0000',                        // tło domyślnie czerwone
-  text1:"", text2:"", text3:"", showGrid:true, // teksty
+  ramka:null, nakladka:null, napis:null,
+  img:null, imgAngle:0,
+  baseScale:1, zoomExtra:0, offx:0, offy:0,
+  bright:100, sat:100, cont:100, sharp:100,
+  bgColor:'#FF0000',
+  text1:"", text2:"", text3:"", showGrid:true,
   maskBBox:{x:0,y:0,w:W,h:H}, _renderForExport:false
 };
 
 const el = id => document.getElementById(id);
 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
 
-// --- Helpers ---
-function loadImage(src){
-  return new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=src; });
-}
+// --- Helpers (ładowanie, bbox, wyostrzenie) ---
+function loadImage(src){ return new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=src; }); }
 function computeMaskBBox(maskImg){
   const off=document.createElement('canvas'); off.width=W; off.height=H;
   const octx=off.getContext('2d'); octx.drawImage(maskImg,0,0,W,H);
   const img=octx.getImageData(0,0,W,H), d=img.data;
   let minx=W, miny=H, maxx=-1, maxy=-1;
-  for(let y=0;y<H;y++){ for(let x=0;x<W;x++){
-    const a=d[(y*W+x)*4+3]; if(a>10){ if(x<minx)minx=x; if(x>maxx)maxx=x; if(y<miny)miny=y; if(y>maxy)maxy=y; }
+  for(let y=0;y<H;y++){ for(let x=0;x<W;x++){ const a=d[(y*W+x)*4+3];
+    if(a>10){ if(x<minx)minx=x; if(x>maxx)maxx=x; if(y<miny)miny=y; if(y>maxy)maxy=y; }
   } }
   if(maxx<minx) return {x:0,y:0,w:W,h:H};
   return {x:minx,y:miny,w:maxx-minx+1,h:maxy-miny+1};
@@ -67,7 +66,7 @@ function computeBaseScaleForImage(img){
   const {w:mw,h:mh}=state.maskBBox; return Math.max(mw/iw, mh/ih);
 }
 
-// --- Łamanie tekstu: Enter + całe słowa ---
+// --- Zawijanie tekstu: Enter + całe słowa ---
 function wrapParagraph(ctx, text, maxWidth){
   const words=(text||'').trim().split(/\s+/); const lines=[]; let line='';
   for(const w of words){
@@ -109,7 +108,6 @@ function render(){
     octx.drawImage(state.img, -srcW*scale/2, -srcH*scale/2, srcW*scale, srcH*scale);
     octx.restore();
 
-    // maskowanie
     octx.globalCompositeOperation='destination-in';
     octx.drawImage(state.ramka,0,0,W,H);
     const sharpened = (state.sharp===100)? off : applySharpen(off, state.sharp);
@@ -123,7 +121,7 @@ function render(){
   // Teksty
   ctx.fillStyle="#fff"; ctx.textAlign="left"; ctx.textBaseline="alphabetic";
 
-  // DUŻY (TT-Travels)
+  // DUŻY – TT-Travels
   const useF1 = document.fonts.check(`${FONT1_PX}px "TT-Travels-Next-DemiBold"`);
   ctx.font = `${FONT1_PX}px ${useF1?'"TT-Travels-Next-DemiBold"':'Arial'}, sans-serif`;
   const left1=70, maxWidth1=W-left1*2;
@@ -133,7 +131,7 @@ function render(){
     ctx.fillText(lines1[lines1.length-1-i], left1, y);
   }
 
-  // MAŁY (TT-Commons)
+  // MAŁY – TT-Commons
   const useF2 = document.fonts.check(`${FONT2_PX}px "TT-Commons-Medium"`);
   ctx.font = `${FONT2_PX}px ${useF2?'"TT-Commons-Medium"':'Arial'}, sans-serif`;
   const left2=75, maxWidth2=W-left2*2;
@@ -143,7 +141,7 @@ function render(){
     ctx.fillText(lines2[i], left2, y);
   }
 
-  // M — MNIEJSZY (TT-Commons)
+  // M – MNIEJSZY 25px – TT-Commons
   if(LAYOUT==='M'){
     const useF3 = document.fonts.check(`${FONT3_PX}px "TT-Commons-Medium"`);
     ctx.font = `${FONT3_PX}px ${useF3?'"TT-Commons-Medium"':'Arial'}, sans-serif`;
@@ -155,7 +153,7 @@ function render(){
     }
   }
 
-  // Siatka tylko w podglądzie
+  // Siatka – tylko podgląd
   if(state.showGrid && !state._renderForExport){
     ctx.strokeStyle="rgba(255,255,255,.5)"; ctx.lineWidth=1;
     ctx.beginPath();
@@ -167,7 +165,7 @@ function render(){
   }
 }
 
-// --- Preload warstw i fontów ---
+// --- Preload ---
 async function preload(){
   try{
     const base='pliki/', p=LAYOUT+'_';
@@ -205,7 +203,7 @@ function saveJPG(){
   }, 'image/jpeg', 0.9);
 }
 
-// --- UI & Gesty ---
+// --- UI & Gesty & PWA ---
 function bindUI(){
   // tło
   el('bgRed').addEventListener('click',()=>{ state.bgColor='#FF0000'; render(); });
