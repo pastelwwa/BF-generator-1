@@ -1,3 +1,7 @@
+/* global fixy */
+* { box-sizing: border-box; }
+html, body { overflow-x: hidden; }
+
 /* webfonty */
 @font-face {
   font-family: "TT-Travels-Next-DemiBold";
@@ -14,28 +18,34 @@
 html,body{margin:0;padding:0;height:100%;background:var(--bg);color:var(--fg);font-family:"Segoe UI",Roboto,Arial,sans-serif}
 button,input,textarea{font-family:inherit}
 
+/* header / footer */
 header,footer{background:#111;padding:8px 16px;display:flex;align-items:center;justify-content:space-between}
+header .left{display:flex;align-items:center;gap:12px}
 header h1{font-size:18px;margin:0}
-footer{font-size:12px;color:var(--muted);gap:12px}
+header .back{display:inline-block;background:#222;color:#fff;text-decoration:none;border-radius:8px;padding:6px 10px}
+header .back:hover{background:#333}
+footer{font-size:12px;color:var(--muted);gap:12px;flex-wrap:wrap}
 footer .credit{margin-left:auto;opacity:.7}
 footer .row{display:flex;gap:8px}
 
-main{display:grid;grid-template-columns:360px 1fr;gap:20px;height:calc(100% - 80px);padding:16px;box-sizing:border-box}
-.controls{display:flex;flex-direction:column;gap:14px;overflow-y:auto}
+/* layout */
+main{
+  display:grid;grid-template-columns:340px 1fr; /* 340 zamiast 360 – minimalnie wężej */
+  gap:20px;height:calc(100% - 80px);padding:16px;box-sizing:border-box
+}
+.controls{min-width:0;display:flex;flex-direction:column;gap:14px;overflow-y:auto}
 .controls .group{background:#2a2a2a;padding:12px;border-radius:8px;display:flex;flex-direction:column;gap:12px}
 .controls .group h2{margin:0 0 2px;font-size:14px;color:var(--accent);font-weight:600;text-transform:uppercase}
 
-/* Wiersz formularza: lewa kolumna stała, prawa elastyczna */
+/* siatka formularza: lewa kolumna stała, prawa = 100% (suwaki/textarea) */
 .controls .group label{
   width:100%;
   display:grid;
-  grid-template-columns:180px 1fr;
+  grid-template-columns: 160px 1fr; /* delikatnie węższa lewa kolumna */
   align-items:center;
   gap:12px;
   font-size:13px;
 }
-
-/* Suwaki i textarea wypełniają 100% prawej kolumny */
 .controls input[type="range"]{ width:100%; }
 .controls textarea{
   width:100%; resize:vertical; min-height:60px;
@@ -43,6 +53,7 @@ main{display:grid;grid-template-columns:360px 1fr;gap:20px;height:calc(100% - 80
   background:#111; color:var(--fg); font-size:14px;
 }
 
+/* wiersze z przyciskami */
 .controls .row{display:flex;gap:8px;flex-wrap:wrap}
 
 button{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px 14px;font-size:14px;cursor:pointer;transition:background .2s}
@@ -51,18 +62,20 @@ button.danger{background:var(--danger)}button.danger:hover{background:#c0392b}
 button.ghost{background:transparent;color:var(--muted);border:1px dashed var(--muted)}button.ghost:hover{border-color:var(--fg);color:var(--fg)}
 button.tiny{font-size:12px;padding:6px 10px}
 
-/* Podgląd – szare tło, by było widać czarną krawędź */
+/* podgląd – szare tło by było widać czarne krawędzie obrazu */
 .preview{
   display:flex;flex-direction:column;align-items:center;
-  background:#808080; padding:8px; border-radius:8px
+  background:#808080; padding:8px; border-radius:8px;
 }
 #c{background:#333;border-radius:12px;max-width:100%;height:auto;display:block;touch-action:none}
 
+/* zapis */
 .save-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.save-row input{flex:1;padding:8px;border-radius:8px;border:1px solid #444;background:#111;color:var(--fg);font-size:14px}
+.save-row label{display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;width:100%}
+.save-row input{width:100%;padding:8px;border-radius:8px;border:1px solid #444;background:#111;color:var(--fg);font-size:14px}
 .save-row button{flex-shrink:0}
 
-/* Mobile */
+/* mobile */
 @media (max-width:900px){
   main{display:flex;flex-direction:column;gap:12px;padding:12px;height:auto}
   .preview{order:-1;padding:6px}
@@ -74,7 +87,7 @@ button.tiny{font-size:12px;padding:6px 10px}
   .controls .save-row{position:sticky;bottom:8px;background:linear-gradient(180deg,transparent,var(--bg) 30%);padding-top:8px;z-index:10}
 }
 
-/* Desktop – canvas nie większy niż okno */
+/* desktop – canvas nie większy niż okno */
 @media (min-width:901px){
   #c{max-height:calc(100vh - 220px); width:auto; height:auto; max-width:100%}
 }
