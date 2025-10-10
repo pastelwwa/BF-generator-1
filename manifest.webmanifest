@@ -3,7 +3,7 @@
   "short_name": "BF Generator",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#1e1e1e",
+  "background_color": "#808080",
   "theme_color": "#1e1e1e",
   "icons": [
     { "src": "pliki/appicon.png", "sizes": "512x512", "type": "image/png" }
