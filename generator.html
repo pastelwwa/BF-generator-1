@@ -21,10 +21,12 @@
       <div class="group">
         <h2>Źródło zdjęcia</h2>
         <input id="photoInput" type="file" accept="image/*">
-        <div class="row">
-          <button id="bgRed">Czerwone tło</button>
-          <button id="bgBlack" class="ghost">Czarne tło</button>
-        </div>
+        <label>Tło:
+          <div class="row">
+            <button id="bgRed">Czerwone</button>
+            <button id="bgBlack" class="ghost">Czarne</button>
+          </div>
+        </label>
       </div>
 
       <div class="group">
@@ -45,14 +47,14 @@
 
       <div class="group">
         <h2>Tekst</h2>
-        <label>Tekst duży (wersaliki):<br>
-          <textarea id="text1" rows="3"></textarea>
+        <label>Tekst duży (wersaliki):
+          <textarea id="text1" rows="3" spellcheck="false"></textarea>
         </label>
-        <label>Tekst mały:<br>
-          <textarea id="text2" rows="3"></textarea>
+        <label>Tekst mały:
+          <textarea id="text2" rows="3" spellcheck="false"></textarea>
         </label>
-        <label id="smallTextRow" style="display:none;">Tekst mniejszy:<br>
-          <textarea id="text3" rows="3"></textarea>
+        <label id="smallTextRow" style="display:none;">Tekst mniejszy:
+          <textarea id="text3" rows="3" spellcheck="false"></textarea>
         </label>
       </div>
 
