@@ -13,14 +13,20 @@
 </head>
 <body>
   <header>
-    <h1 id="layoutTitle">Generator (layout ...)</h1>
+    <div class="left">
+      <a class="back" href="index.html" title="Powrót">←</a>
+      <h1 id="layoutTitle">Generator</h1>
+    </div>
+    <div></div>
   </header>
 
   <main>
     <div class="controls">
       <div class="group">
         <h2>Źródło zdjęcia</h2>
-        <input id="photoInput" type="file" accept="image/*">
+        <label>Wybierz plik:
+          <input id="photoInput" type="file" accept="image/*">
+        </label>
         <label>Tło:
           <div class="row">
             <button id="bgRed">Czerwone</button>
@@ -63,7 +69,9 @@
       </div>
 
       <div class="group save-row">
-        <input id="outname" value="wynik">
+        <label>Nazwa pliku:
+          <input id="outname" value="wynik">
+        </label>
         <button id="saveJpgBtn">Zapisz JPG</button>
       </div>
 
