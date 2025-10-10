@@ -22,43 +22,59 @@ footer .row{display:flex;gap:8px}
 
 main{display:grid;grid-template-columns:360px 1fr;gap:20px;height:calc(100% - 80px);padding:16px;box-sizing:border-box}
 .controls{display:flex;flex-direction:column;gap:14px;overflow-y:auto}
-.controls .group{background:#2a2a2a;padding:12px;border-radius:8px;display:flex;flex-direction:column;gap:8px}
-.controls .group h2{margin:0 0 6px;font-size:14px;color:var(--accent);font-weight:600;text-transform:uppercase}
-.controls label{font-size:13px;display:flex;justify-content:space-between;align-items:center;gap:6px}
-.controls input[type="range"]{flex:1}
-.controls textarea{width:100%;resize:vertical;min-height:60px;padding:6px;border-radius:6px;border:1px solid #444;background:#111;color:var(--fg);font-size:14px}
+.controls .group{background:#2a2a2a;padding:12px;border-radius:8px;display:flex;flex-direction:column;gap:12px}
+.controls .group h2{margin:0 0 2px;font-size:14px;color:var(--accent);font-weight:600;text-transform:uppercase}
+
+/* Wiersz formularza: lewa kolumna stała, prawa elastyczna */
+.controls .group label{
+  width:100%;
+  display:grid;
+  grid-template-columns:180px 1fr;
+  align-items:center;
+  gap:12px;
+  font-size:13px;
+}
+
+/* Suwaki i textarea wypełniają 100% prawej kolumny */
+.controls input[type="range"]{ width:100%; }
+.controls textarea{
+  width:100%; resize:vertical; min-height:60px;
+  padding:8px; border-radius:8px; border:1px solid #444;
+  background:#111; color:var(--fg); font-size:14px;
+}
+
 .controls .row{display:flex;gap:8px;flex-wrap:wrap}
 
-button{background:var(--accent);color:#fff;border:none;border-radius:6px;padding:8px 12px;font-size:14px;cursor:pointer;transition:background .2s}
+button{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px 14px;font-size:14px;cursor:pointer;transition:background .2s}
 button:hover{background:#379fdc}
 button.danger{background:var(--danger)}button.danger:hover{background:#c0392b}
 button.ghost{background:transparent;color:var(--muted);border:1px dashed var(--muted)}button.ghost:hover{border-color:var(--fg);color:var(--fg)}
-button.tiny{font-size:12px;padding:4px 8px}
+button.tiny{font-size:12px;padding:6px 10px}
 
-.preview{display:flex;flex-direction:column;align-items:center;background:#000;padding:8px;border-radius:8px}
+/* Podgląd – szare tło, by było widać czarną krawędź */
+.preview{
+  display:flex;flex-direction:column;align-items:center;
+  background:#808080; padding:8px; border-radius:8px
+}
 #c{background:#333;border-radius:12px;max-width:100%;height:auto;display:block;touch-action:none}
-.preview .wide{width:100%;margin-top:10px}
 
 .save-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.save-row input{flex:1;padding:6px;border-radius:6px;border:1px solid #444;background:#111;color:var(--fg);font-size:14px}
+.save-row input{flex:1;padding:8px;border-radius:8px;border:1px solid #444;background:#111;color:var(--fg);font-size:14px}
 .save-row button{flex-shrink:0}
 
+/* Mobile */
 @media (max-width:900px){
   main{display:flex;flex-direction:column;gap:12px;padding:12px;height:auto}
-  .preview{order:-1;padding:4px}
+  .preview{order:-1;padding:6px}
   #c{width:100%;height:auto;max-width:100%}
-  .controls .group{padding:10px;margin-bottom:10px}
-  .controls .group label{display:grid;grid-template-columns:120px 1fr;align-items:center;gap:10px}
+  .controls .group{padding:10px}
+  .controls .group label{grid-template-columns:140px 1fr}
   .controls textarea{min-height:80px;font-size:16px}
   .controls input[type="range"]{height:28px}
   .controls .save-row{position:sticky;bottom:8px;background:linear-gradient(180deg,transparent,var(--bg) 30%);padding-top:8px;z-index:10}
 }
 
-/* Dopasowanie do viewportu na desktopie */
+/* Desktop – canvas nie większy niż okno */
 @media (min-width:901px){
   #c{max-height:calc(100vh - 220px); width:auto; height:auto; max-width:100%}
 }
-
-/* iOS tooltip, gdybyś chciał kiedyś wrócić – na razie nieużywany */
-.ios-tip{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#222;border:1px solid #444;color:#fff;padding:10px 12px;border-radius:10px;max-width:90%;box-shadow:0 6px 24px rgba(0,0,0,.5);display:flex;gap:10px;align-items:center}
-.ios-tip button{background:#444}
