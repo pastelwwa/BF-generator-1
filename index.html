@@ -2,82 +2,43 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Generator zdjęć 1081x1447</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wybierz layout</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#1e1e1e">
+  <meta name="theme-color" content="#808080">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="pliki/appicon.png">
+  <style>
+    body { background:#808080; }
+    .choose-wrap{
+      max-width:1200px;margin:20px auto;padding:12px;box-sizing:border-box;
+      display:grid;grid-template-columns:1fr 1fr;gap:16px;
+    }
+    h1{ text-align:center;margin:16px 0 8px 0; }
+    .card{
+      background:#111; border:1px solid #333; border-radius:10px; padding:10px;
+      display:flex; flex-direction:column; align-items:center; gap:10px;
+    }
+    .card img{ width:100%; height:auto; border-radius:8px; display:block; }
+    .card a{ display:inline-block; padding:8px 12px; border-radius:6px;
+      background:#4cafef; color:#fff; text-decoration:none; }
+    .card a:hover{ background:#379fdc; }
+    @media (max-width:900px){ .choose-wrap{ grid-template-columns:1fr; } }
+  </style>
 </head>
 <body>
-  <header>
-    <h1>Generator zdjęć 1081×1447</h1>
-  </header>
-
-  <main>
-    <div class="controls">
-      <div class="group">
-        <h2>Źródło zdjęcia</h2>
-        <input id="photoInput" type="file" accept="image/*">
-      </div>
-
-      <div class="group">
-        <h2>Dopasowanie i korekcje</h2>
-        <label>Zoom (%) <input type="range" id="zoomExtra" min="0" max="200" value="0"></label>
-        <label>Przesunięcie X <input type="range" id="offx" min="-800" max="800" value="0"></label>
-        <label>Przesunięcie Y <input type="range" id="offy" min="-800" max="800" value="0"></label>
-        <label>Jasność <input type="range" id="bright" min="0" max="200" value="100"></label>
-        <label>Nasycenie <input type="range" id="sat" min="0" max="200" value="100"></label>
-        <label>Kontrast <input type="range" id="cont" min="0" max="200" value="100"></label>
-        <label>Ostrość <input type="range" id="sharp" min="50" max="150" value="100"></label>
-        <div class="row">
-          <button id="autoFitBtn">Dopasuj do ramki</button>
-          <button id="rotateBtn">Obróć 90°</button>
-          <button id="resetCorrBtn" class="danger">Reset korekcji</button>
-        </div>
-      </div>
-
-      <div class="group">
-        <h2>Tekst</h2>
-        <label>Tekst duży (wersaliki):<br>
-          <textarea id="text1" rows="3"></textarea>
-        </label>
-        <label>Tekst mały:<br>
-          <textarea id="text2" rows="3"></textarea>
-        </label>
-      </div>
-
-      <div class="group">
-        <label class="checkbox"><input type="checkbox" id="showGrid" checked> Pokaż siatkę 3×3</label>
-      </div>
-
-      <div class="group save-row">
-        <input id="outname" value="wynik">
-        <button id="savePngBtn">Zapisz PNG</button>
-        <button id="saveJpgBtn">Zapisz JPG</button>
-      </div>
-
-      <button id="resetAllBtn" class="danger">Reset wszystkiego</button>
+  <h1>Wybierz layout</h1>
+  <div class="choose-wrap">
+    <div class="card">
+      <img src="pliki/D_okno.png" alt="Layout D">
+      <a href="generator.html?layout=D">Użyj layoutu D</a>
     </div>
-
-    <div class="preview">
-      <canvas id="c" width="1081" height="1447" aria-label="Podgląd"></canvas>
+    <div class="card">
+      <img src="pliki/M_okno.png" alt="Layout M">
+      <a href="generator.html?layout=M">Użyj layoutu M</a>
     </div>
-  </main>
-
-  <footer>
-    <span id="status">Ładowanie…</span>
-    <span class="credit">Design &amp; code by Jacek M.</span>
-    <div class="row">
-      <button id="installBtn" class="ghost tiny">Zainstaluj</button>
-      <button id="fullscreenBtn" class="ghost tiny">Pełny ekran</button>
-      <button id="checkBtn" class="ghost tiny">Sprawdź</button>
-    </div>
-  </footer>
-
-  <script src="app.js"></script>
+  </div>
 </body>
 </html>
-
