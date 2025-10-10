@@ -1,34 +1,50 @@
-// Stałe canvas
+// --- Stałe canvas ---
 const W = 1081, H = 1447;
 const c = document.getElementById("c");
 const ctx = c.getContext("2d");
 
-// Fonty i odstępy
+// --- Fonty / leading ---
 const FONT1_PX = 60; // duży
 const FONT2_PX = 30; // mały
+const FONT3_PX = 25; // mniejszy (tylko M)
 const LH1 = Math.round(FONT1_PX * 1.05);
 const LH2 = Math.round(FONT2_PX * 1.15);
+const LH3 = Math.round(FONT3_PX * 1.15);
 
-// Stan
+// --- Layout z query ---
+const params = new URLSearchParams(location.search);
+const LAYOUT = (params.get('layout') || 'D').toUpperCase();
+document.getElementById('layoutTitle').textContent = `Generator (layout ${LAYOUT})`;
+if(LAYOUT === 'M') document.getElementById('smallTextRow').style.display = '';
+
+// --- Stan aplikacji ---
 const state = {
-  tlo:null, mask:null, nakladka:null, logo:null,
+  // warstwy
+  ramka:null, nakladka:null, napis:null,
+  // zdjęcie
   img:null, imgAngle:0,
-  baseScale:1,          // minimalny scale (cover)
-  zoomExtra:0,          // nadmiar powyżej cover (0..200%)
-  offx:0, offy:0,
+  // dopasowanie
+  baseScale:1, zoomExtra:0, offx:0, offy:0,
+  // korekcje
   bright:100, sat:100, cont:100, sharp:100,
-  text1:"", text2:"", showGrid:true,
+  // tło
+  bgColor:'#FF0000', // domyślnie czerwone
+  // teksty
+  text1:"", text2:"", text3:"", // text3 tylko M
+  showGrid:true,
+  // mask bbox
   maskBBox:{x:0,y:0,w:W,h:H}
 };
 
 const el = id => document.getElementById(id);
 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
 
+// --- Ładowanie obrazka ---
 function loadImage(src){
   return new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=src; });
 }
 
-// bbox nieprzezroczystości maski (dla cover)
+// --- Zczytywanie bbox nieprzezroczystej maski ---
 function computeMaskBBox(maskImg){
   const off=document.createElement('canvas'); off.width=W; off.height=H;
   const octx=off.getContext('2d');
@@ -45,6 +61,7 @@ function computeMaskBBox(maskImg){
   return {x:minx,y:miny,w:maxx-minx+1,h:maxy-miny+1};
 }
 
+// --- Wyostrzenie ---
 function applySharpen(srcCanvas, amountPct){
   const amount=Math.max(0,Math.min(2,amountPct/100));
   if(amount===1) return srcCanvas;
@@ -77,34 +94,51 @@ function applySharpen(srcCanvas, amountPct){
   return srcCanvas;
 }
 
-function computeBaseScaleForImage(img){
-  const ang = state.imgAngle % 4;
-  const iw = (ang%2===0)? img.width : img.height;
-  const ih = (ang%2===0)? img.height: img.width;
-  const mw = state.maskBBox.w, mh = state.maskBBox.h;
-  return Math.max(mw/iw, mh/ih); // cover
+// --- Tekst: łamanie całymi słowami (bez dzielenia) ---
+function wrapTextIntoLines(ctx, text, maxWidth){
+  const words = (text||'').split(/\s+/);
+  const lines = [];
+  let line = '';
+  for(const w of words){
+    const test = line ? (line + ' ' + w) : w;
+    if(ctx.measureText(test).width <= maxWidth){
+      line = test;
+    }else{
+      if(line) lines.push(line);
+      // jeśli pojedyncze słowo dłuższe niż maxWidth – przenosimy całe do nowej linii
+      line = w;
+    }
+  }
+  if(line) lines.push(line);
+  return lines;
 }
 
+// --- Skalowanie cover względem ramki ---
+function computeBaseScaleForImage(img){
+  const ang = state.imgAngle % 4;
+  const iw = (ang%2===0)? img.width  : img.height;
+  const ih = (ang%2===0)? img.height : img.width;
+  const {w:mw, h:mh} = state.maskBBox;
+  return Math.max(mw/iw, mh/ih);
+}
+
+// --- Render ---
 function render(){
-  if(!state.tlo){ return; }
+  // tło (kolor)
+  ctx.save();
+  ctx.fillStyle = state.bgColor;
+  ctx.fillRect(0,0,W,H);
+  ctx.restore();
 
-  // tło
-  ctx.clearRect(0,0,W,H);
-  ctx.drawImage(state.tlo,0,0,W,H);
-
-  // zdjęcie -> offscreen -> maska
-  if(state.img && state.mask){
+  // zdjęcie + maska
+  if(state.img && state.ramka){
     const off=document.createElement('canvas'); off.width=W; off.height=H;
     const octx=off.getContext('2d');
-
-    // korekcje
     octx.filter=`brightness(${state.bright/100}) saturate(${state.sat/100}) contrast(${state.cont/100})`;
 
-    // skalowanie: baseScale * (1+zoomExtra/100)
     const scale = state.baseScale * (1 + state.zoomExtra/100);
     const ang = state.imgAngle % 4;
 
-    // środek maski + przesunięcia
     const cx = state.maskBBox.x + state.maskBBox.w/2 + state.offx;
     const cy = state.maskBBox.y + state.maskBBox.h/2 + state.offy;
 
@@ -112,55 +146,90 @@ function render(){
     octx.translate(cx,cy);
     octx.rotate(ang*Math.PI/2);
 
-    // wymiary po obrocie
-    const srcW = (ang%2===0)? state.img.width : state.img.height;
-    const srcH = (ang%2===0)? state.img.height: state.img.width;
+    const srcW = (ang%2===0)? state.img.width  : state.img.height;
+    const srcH = (ang%2===0)? state.img.height : state.img.width;
     const drawW = srcW*scale, drawH = srcH*scale;
 
     octx.drawImage(state.img, -drawW/2, -drawH/2, drawW, drawH);
     octx.restore();
 
-    // maskowanie
+    // maskowanie (destination-in)
     octx.save();
     octx.globalCompositeOperation='destination-in';
-    octx.drawImage(state.mask,0,0,W,H);
+    octx.drawImage(state.ramka,0,0,W,H);
     octx.restore();
 
-    // ostrość
     const sharpened = (state.sharp===100)? off : applySharpen(off, state.sharp);
-
     ctx.drawImage(sharpened,0,0);
   }
 
-  // nakładki
+  // nakładka + napis (statyczne PNG)
   if(state.nakladka) ctx.drawImage(state.nakladka,0,0,W,H);
-  if(state.logo) ctx.drawImage(state.logo,0,0,W,H);
+  if(state.napis)    ctx.drawImage(state.napis,   0,0,W,H);
 
-  // teksty
+  // TEKSTY (po PNG)
   ctx.fillStyle="#fff";
   ctx.textAlign="left";
   ctx.textBaseline="alphabetic";
 
-  // duży (linia bazowa 1154, w górę)
-  const useFont1 = document.fonts.check(`${FONT1_PX}px "TT-Travels-Next-DemiBold"`);
-  ctx.font = `${FONT1_PX}px ${useFont1?'"TT-Travels-Next-DemiBold"':'Arial'}, sans-serif`;
-  const lines1=(state.text1||"").toUpperCase().split("\n");
-  for(let i=0;i<lines1.length;i++){
-    const y=1154 - i*LH1;
-    ctx.fillText(lines1[lines1.length-1-i], 70, y);
+  const useF1 = document.fonts.check(`${FONT1_PX}px "TT-Travels-Next-DemiBold"`);
+  const useF2 = document.fonts.check(`${FONT2_PX}px "TT-Commons-Medium"`);
+  const useF3 = useF2; // mniejszy bazuje na tej samej rodzinie co mały
+
+  // Layout D – pozycje jak wcześniej
+  if(LAYOUT === 'D'){
+    // DUŻY (wersaliki, w górę, X=70, Y=1154)
+    ctx.font = `${FONT1_PX}px ${useF1?'"TT-Travels-Next-DemiBold"':'Arial'}, sans-serif`;
+    const left1 = 70, maxWidth1 = W - left1*2;
+    const lines1 = wrapTextIntoLines(ctx, (state.text1||'').toUpperCase(), maxWidth1);
+    for(let i=0;i<lines1.length;i++){
+      const y = 1154 - i*LH1;
+      ctx.fillText(lines1[lines1.length-1-i], left1, y);
+    }
+
+    // MAŁY (w dół, X=75, Y=1201)
+    ctx.font = `${FONT2_PX}px ${useF2?'"TT-Commons-Medium"':'Arial'}, sans-serif`;
+    const left2 = 75, maxWidth2 = W - left2*2;
+    const lines2 = wrapTextIntoLines(ctx, state.text2||'', maxWidth2);
+    for(let i=0;i<lines2.length;i++){
+      const y = 1201 + i*LH2;
+      ctx.fillText(lines2[i], left2, y);
+    }
   }
 
-  // mały (linia bazowa 1201, w dół)
-  const useFont2 = document.fonts.check(`${FONT2_PX}px "TT-Commons-Medium"`);
-  ctx.font = `${FONT2_PX}px ${useFont2?'"TT-Commons-Medium"':'Arial'}, sans-serif`;
-  const lines2=(state.text2||"").split("\n");
-  for(let i=0;i<lines2.length;i++){
-    const y=1201 + i*LH2;
-    ctx.fillText(lines2[i], 75, y);
+  // Layout M – nowe pozycje
+  if(LAYOUT === 'M'){
+    // DUŻY (wersaliki, w górę, X=70, Y=189)
+    ctx.font = `${FONT1_PX}px ${useF1?'"TT-Travels-Next-DemiBold"':'Arial'}, sans-serif`;
+    const left1 = 70, maxWidth1 = W - left1*2;
+    const lines1 = wrapTextIntoLines(ctx, (state.text1||'').toUpperCase(), maxWidth1);
+    for(let i=0;i<lines1.length;i++){
+      const y = 189 - i*LH1;
+      ctx.fillText(lines1[lines1.length-1-i], left1, y);
+    }
+
+    // MAŁY (w dół, X=75, Y=236)
+    ctx.font = `${FONT2_PX}px ${useF2?'"TT-Commons-Medium"':'Arial'}, sans-serif`;
+    const left2 = 75, maxWidth2 = W - left2*2;
+    const lines2 = wrapTextIntoLines(ctx, state.text2||'', maxWidth2);
+    for(let i=0;i<lines2.length;i++){
+      const y = 236 + i*LH2;
+      ctx.fillText(lines2[i], left2, y);
+    }
+
+    // MNIEJSZY 25px (w dół, X=75, Y=366, maxX=570 → maxWidth=570-left)
+    ctx.font = `${FONT3_PX}px ${useF3?'"TT-Commons-Medium"':'Arial'}, sans-serif`;
+    const left3 = 75, maxWidth3 = 570 - left3; // ograniczenie szerokości
+    const lines3 = wrapTextIntoLines(ctx, state.text3||'', maxWidth3);
+    for(let i=0;i<lines3.length;i++){
+      const y = 366 + i*LH3;
+      ctx.fillText(lines3[i], left3, y);
+    }
   }
 
-  // siatka
-  if(state.showGrid){
+  // Siatka tylko w podglądzie (nie zapisuje się – bo render jest wspólny;
+  // do zapisu tworzymy oddzielny render bez siatki)
+  if(state.showGrid && !state._renderForExport){
     ctx.strokeStyle="rgba(255,255,255,.5)";
     ctx.lineWidth=1;
     ctx.beginPath();
@@ -172,19 +241,19 @@ function render(){
   }
 }
 
-// PRELOAD
+// --- Preload zasobów wg layoutu ---
 async function preload(){
   try{
     const base='pliki/';
-    [state.tlo,state.mask,state.nakladka,state.logo] = await Promise.all([
-      loadImage(base+'tlo.png'),
-      loadImage(base+'fotoramka.png'),
-      loadImage(base+'nakladka.png'),
-      loadImage(base+'logo.png'),
+    const prefix = LAYOUT + '_'; // 'D_' lub 'M_'
+    const [ramka, nakladka, napis] = await Promise.all([
+      loadImage(base + prefix + 'ramka.png'),
+      loadImage(base + prefix + 'nakladka.png'),
+      loadImage(base + prefix + 'napis.png'),
     ]);
-    state.maskBBox = computeMaskBBox(state.mask);
+    state.ramka=ramka; state.nakladka=nakladka; state.napis=napis;
+    state.maskBBox = computeMaskBBox(ramka);
 
-    // fonty – nie blokuj renderu, ale poczekaj chwilę jeśli się da
     await Promise.allSettled([
       document.fonts.load(`${FONT1_PX}px "TT-Travels-Next-DemiBold"`),
       document.fonts.load(`${FONT2_PX}px "TT-Commons-Medium"`),
@@ -192,26 +261,37 @@ async function preload(){
     ]);
 
     el('status').textContent='Zasoby OK. Wczytaj zdjęcie.';
+    render();
   }catch(e){
     el('status').textContent='Błąd ładowania zasobów: '+e;
   }
 }
 
-// ZAPIS
-function saveImage(type){
+// --- Zapis JPG (bez siatki) ---
+function saveJPG(){
+  // render bez siatki
+  state._renderForExport = true;
+  render();
+  state._renderForExport = false;
+
   const base=(el('outname').value||'wynik').replace(/[^a-zA-Z0-9_.-]/g,'_');
-  const ext= type==='png'?'png':'jpg';
-  const mime= type==='png'?'image/png':'image/jpeg';
   c.toBlob(blob=>{
     const a=document.createElement('a');
     a.href=URL.createObjectURL(blob);
-    a.download=`${base}.${ext}`;
-    a.click(); URL.revokeObjectURL(a.href);
-  }, mime, type==='jpg'?0.9:undefined);
+    a.download=`${base}.jpg`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    render(); // po zapisie wróć do podglądu z siatką (jeśli była)
+  }, 'image/jpeg', 0.9);
 }
 
-// UI
+// --- UI / Gesty / PWA ---
 function bindUI(){
+  // tło
+  el('bgRed').addEventListener('click',()=>{ state.bgColor='#FF0000'; render(); });
+  el('bgBlack').addEventListener('click',()=>{ state.bgColor='#000000'; render(); });
+
+  // foto
   el('photoInput').addEventListener('change', e=>{
     const f=e.target.files?.[0]; if(!f) return;
     const url=URL.createObjectURL(f);
@@ -227,18 +307,20 @@ function bindUI(){
     img.src=url;
   });
 
+  // suwaki
   el('zoomExtra').addEventListener('input', e=>{ state.zoomExtra=+e.target.value; render(); });
   ['offx','offy','bright','sat','cont','sharp'].forEach(id=>{
     el(id).addEventListener('input', e=>{ state[id]=+e.target.value; render(); });
   });
 
+  // teksty
   el('text1').addEventListener('input', e=>{ state.text1=e.target.value; render(); });
   el('text2').addEventListener('input', e=>{ state.text2=e.target.value; render(); });
+  if(LAYOUT==='M') el('text3').addEventListener('input', e=>{ state.text3=e.target.value; render(); });
   el('showGrid').addEventListener('change', e=>{ state.showGrid=e.target.checked; render(); });
 
-  el('savePngBtn').addEventListener('click', ()=>saveImage('png'));
-  el('saveJpgBtn').addEventListener('click', ()=>saveImage('jpg'));
-
+  // akcje
+  el('saveJpgBtn').addEventListener('click', saveJPG);
   el('autoFitBtn').addEventListener('click', ()=>{
     if(!state.img) return;
     state.baseScale=computeBaseScaleForImage(state.img);
@@ -246,28 +328,26 @@ function bindUI(){
     state.offx=0; state.offy=0; el('offx').value=0; el('offy').value=0;
     render();
   });
-
   el('rotateBtn').addEventListener('click', ()=>{
     if(!state.img) return;
     state.imgAngle=(state.imgAngle+1)%4;
     state.baseScale=computeBaseScaleForImage(state.img);
-    state.zoomExtra=Math.max(0,state.zoomExtra);
     render();
   });
-
   el('resetCorrBtn').addEventListener('click', ()=>{
     state.bright=100; state.sat=100; state.cont=100; state.sharp=100;
     ['bright','sat','cont','sharp'].forEach(id=>el(id).value=100);
     render();
   });
-
   el('resetAllBtn').addEventListener('click', ()=>{
     state.img=null; state.imgAngle=0;
     state.baseScale=1; state.zoomExtra=0; state.offx=0; state.offy=0;
     state.bright=100; state.sat=100; state.cont=100; state.sharp=100;
-    state.text1=""; state.text2=""; state.showGrid=true;
+    state.text1=""; state.text2=""; state.text3="";
     ['zoomExtra','offx','offy','bright','sat','cont','sharp'].forEach(id=>el(id).value=(id==='zoomExtra'?0:(id==='offx'||id==='offy'?0:100)));
-    el('text1').value=""; el('text2').value=""; el('showGrid').checked=true;
+    el('text1').value=""; el('text2').value=""; if(LAYOUT==='M') el('text3').value="";
+    el('showGrid').checked=true; state.showGrid=true;
+    state.bgColor='#FF0000';
     render();
   });
 
@@ -292,11 +372,11 @@ function bindUI(){
   });
   c.addEventListener('wheel', e=>{
     e.preventDefault();
-    state.zoomExtra=Math.max(0,Math.min(200,state.zoomExtra + (e.deltaY<0?5:-5)));
+    state.zoomExtra=Math.max(0,Math.min(200,state.zoomExtra+(e.deltaY<0?5:-5)));
     el('zoomExtra').value=state.zoomExtra; render();
   }, {passive:false});
 
-  // Gesty dotyk – blokada scrolla, pan + pinch
+  // Gesty dotyk
   let touchDragging=false, startX=0,startY=0,baseOffX=0,baseOffY=0;
   let pinching=false, startDist=0, baseZoomExtra=0;
   function dist(t1,t2){ return Math.hypot(t2.clientX-t1.clientX,t2.clientY-t1.clientY); }
@@ -309,11 +389,9 @@ function bindUI(){
       baseOffX=state.offx; baseOffY=state.offy;
     }else if(e.touches.length===2){
       pinching=true; touchDragging=false;
-      startDist=dist(e.touches[0],e.touches[1]);
-      baseZoomExtra=state.zoomExtra;
+      startDist=dist(e.touches[0],e.touches[1]); baseZoomExtra=state.zoomExtra;
     }
   }, {passive:false});
-
   c.addEventListener('touchmove', e=>{
     e.preventDefault();
     if(touchDragging && e.touches.length===1){
@@ -327,66 +405,45 @@ function bindUI(){
       const d=dist(e.touches[0],e.touches[1]);
       const ratio=d/Math.max(1,startDist);
       state.zoomExtra=Math.max(0,Math.min(200,Math.round(baseZoomExtra+(ratio-1)*100)));
-      el('zoomExtra').value=state.zoomExtra;
-      render();
+      el('zoomExtra').value=state.zoomExtra; render();
     }
   }, {passive:false});
-
   c.addEventListener('touchend', e=>{ e.preventDefault(); if(e.touches.length===0){ touchDragging=false; pinching=false; } }, {passive:false});
 
-  // PWA install
+  // Instalacja PWA (przycisk na dole)
   setupInstallButton();
 }
 
-// PWA install (Android/desktop prompt + iOS alert)
+// --- PWA install ---
 let deferredPrompt=null;
 function setupInstallButton(){
   const btn=el('installBtn');
-  btn.style.display=''; // zawsze widoczny na dole
-
-  window.addEventListener('beforeinstallprompt', (e)=>{
-    e.preventDefault();
-    deferredPrompt=e;
-  });
-
+  window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); deferredPrompt=e; });
   btn.addEventListener('click', async ()=>{
-    if(deferredPrompt){
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt=null;
-    }else if(isIOS){
-      alert('Na iPhonie: Udostępnij → Dodaj do ekranu początkowego');
-    }else{
-      alert('Jeśli przeglądarka wspiera instalację PWA, pokaże się monit przy następnej wizycie.');
-    }
+    if(deferredPrompt){ deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null; }
+    else if(isIOS){ alert('Na iPhonie: Udostępnij → Dodaj do ekranu początkowego'); }
   });
 }
 
-// start
-preload().then(bindUI);
-
-// SW
-if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=> navigator.serviceWorker.register('./service-worker.js'));
-}
-
+// --- Fit canvas do viewportu na desktopie ---
 function fitCanvasToViewport(){
   const preview = document.querySelector('.preview');
-  const pad = 24; // margines bezpieczeństwa
+  const pad = 24;
   const availW = preview.clientWidth - pad;
   const headerH = document.querySelector('header').offsetHeight;
   const footerH = document.querySelector('footer').offsetHeight;
   const availH = window.innerHeight - headerH - footerH - pad;
-
-  const scale = Math.min(availW / W, availH / H, 1); // nigdy > 1 (bez powiększania)
+  const scale = Math.min(availW / W, availH / H, 1);
   c.style.width  = (W * scale) + 'px';
   c.style.height = (H * scale) + 'px';
 }
-
 window.addEventListener('resize', fitCanvasToViewport);
 window.addEventListener('orientationchange', fitCanvasToViewport);
-// po preload/bindUI na końcu pliku:
-fitCanvasToViewport();
 
+// --- Start ---
+preload().then(()=>{ bindUI(); fitCanvasToViewport(); });
 
-
+// --- SW ---
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=> navigator.serviceWorker.register('./service-worker.js'));
+}
