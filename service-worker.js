@@ -1,17 +1,24 @@
-const CACHE = "bfgen-v6";
+const CACHE = "bfgen-v7";
 const ASSETS = [
   "./",
   "./index.html",
+  "./generator.html",
   "./styles.css",
   "./app.js",
   "./manifest.webmanifest",
-  "./pliki/tlo.png",
-  "./pliki/fotoramka.png",
-  "./pliki/nakladka.png",
-  "./pliki/logo.png",
+  // obrazy i warstwy
+  "./pliki/appicon.png",
+  "./pliki/D_okno.png",
+  "./pliki/M_okno.png",
+  "./pliki/D_ramka.png",
+  "./pliki/D_nakladka.png",
+  "./pliki/D_napis.png",
+  "./pliki/M_ramka.png",
+  "./pliki/M_nakladka.png",
+  "./pliki/M_napis.png",
+  // fonty
   "./pliki/fonts/TT-Travels-Next-DemiBold.woff2",
-  "./pliki/fonts/TT-Commons-Medium.woff2",
-  "./pliki/appicon.png"
+  "./pliki/fonts/TT-Commons-Medium.woff2"
 ];
 
 self.addEventListener("install", e=>{
