@@ -20,25 +20,23 @@
     .card{
       background:#111; border:1px solid #333; border-radius:10px; padding:10px;
       display:flex; flex-direction:column; align-items:center; gap:10px; color:#fff;
+      cursor:pointer;
     }
+    .card a{ display:block; width:100%; }
     .card img{ width:100%; height:auto; border-radius:8px; display:block; }
-    .card a{ display:inline-block; padding:8px 12px; border-radius:6px;
-      background:#4cafef; color:#fff; text-decoration:none; font-family:"Segoe UI",Arial,sans-serif;}
-    .card a:hover{ background:#379fdc; }
+    .card:hover{ outline:2px solid #4cafef; outline-offset:2px; }
     @media (max-width:900px){ .choose-wrap{ grid-template-columns:1fr; } }
   </style>
 </head>
 <body>
   <h1>Wybierz layout</h1>
   <div class="choose-wrap">
-    <div class="card">
-      <img src="pliki/D_okno.png" alt="Layout D">
-      <a href="generator.html?layout=D">Użyj layoutu D</a>
-    </div>
-    <div class="card">
-      <img src="pliki/M_okno.png" alt="Layout M">
-      <a href="generator.html?layout=M">Użyj layoutu M</a>
-    </div>
+    <a class="card" href="generator.html?layout=D" aria-label="Generator z dużym zdjęciem">
+      <img src="pliki/D_okno.png" alt="Layout D – duże zdjęcie">
+    </a>
+    <a class="card" href="generator.html?layout=M" aria-label="Generator z małym zdjęciem">
+      <img src="pliki/M_okno.png" alt="Layout M – małe zdjęcie">
+    </a>
   </div>
 </body>
 </html>
