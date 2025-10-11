@@ -18,6 +18,9 @@ const layoutTitle = document.getElementById('layoutTitle');
 layoutTitle.textContent = (LAYOUT === 'M') ? 'Generator z małym zdjęciem' : 'Generator z dużym zdjęciem';
 if(LAYOUT === 'M') document.getElementById('smallTextRow').style.display = '';
 
+const el = id => document.getElementById(id);
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+
 // --- Stan aplikacji ---
 const state = {
   ramka:null, nakladka:null, napis:null,
@@ -29,10 +32,7 @@ const state = {
   maskBBox:{x:0,y:0,w:W,h:H}, _renderForExport:false
 };
 
-const el = id => document.getElementById(id);
-const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-
-// --- Helpers (ładowanie, bbox, wyostrzenie) ---
+// --- Helpers ---
 function loadImage(src){ return new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=src; }); }
 function computeMaskBBox(maskImg){
   const off=document.createElement('canvas'); off.width=W; off.height=H;
@@ -204,15 +204,10 @@ function saveJPG(){
 }
 
 // --- UI & Gesty & PWA ---
-function bindUI()
-// w bindUI():
-el('photoBtn').addEventListener('click', ()=> el('photoInput').click());
-el('photoInput').addEventListener('change', e=>{
-  const f = e.target.files?.[0];
-  el('photoName').textContent = f ? f.name : '';
-  // (reszta Twojej logiki wczytywania zdjęcia już tam jest)
-}, { once:false });
-{
+function bindUI(){
+  // przycisk do wyboru pliku
+  el('photoBtn').addEventListener('click', ()=> el('photoInput').click());
+
   // tło
   el('bgRed').addEventListener('click',()=>{ state.bgColor='#FF0000'; render(); });
   el('bgBlack').addEventListener('click',()=>{ state.bgColor='#000000'; render(); });
@@ -345,4 +340,3 @@ preload().then(()=>{ bindUI(); fitCanvasToViewport(); });
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=> navigator.serviceWorker.register('./service-worker.js'));
 }
-
