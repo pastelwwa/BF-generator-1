@@ -216,10 +216,16 @@ function saveJPG(){
 function bindUI(){
   // przycisk do wyboru pliku
   el('photoBtn').addEventListener('click', ()=> el('photoInput').click());
+updateBgButtons();
 
   // tło
-  el('bgRed').addEventListener('click',()=>{ state.bgColor='#FF0000'; render(); });
-  el('bgBlack').addEventListener('click',()=>{ state.bgColor='#000000'; render(); });
+el('bgRed').addEventListener('click',()=>{
+  state.bgColor='#FF0000'; updateBgButtons(); render();
+});
+el('bgBlack').addEventListener('click',()=>{
+  state.bgColor='#000000'; updateBgButtons(); render();
+});
+
 
   // foto
   el('photoInput').addEventListener('change', e=>{
@@ -262,7 +268,8 @@ function bindUI(){
   el('resetAllBtn').addEventListener('click', ()=>{
     state.img=null; state.imgAngle=0; state.baseScale=1; state.zoomExtra=0; state.offx=0; state.offy=0;
     state.bright=100; state.sat=100; state.cont=100; state.sharp=100;
-    state.text1=""; state.text2=""; state.text3=""; state.showGrid=true; state.bgColor='#FF0000';
+    state.text1=""; state.text2=""; state.text3=""; state.showGrid=true; state.bgColor='#FF0000';updateBgButtons();
+
     ['zoomExtra','offx','offy','bright','sat','cont','sharp'].forEach(id=>el(id).value=(id==='zoomExtra'?0:(id==='offx'||id==='offy'?0:100)));
     el('text1').value=""; el('text2').value=""; if(LAYOUT==='M') el('text3').value="";
     el('showGrid').checked=true; render();
@@ -349,4 +356,5 @@ preload().then(()=>{ bindUI(); fitCanvasToViewport(); });
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=> navigator.serviceWorker.register('./service-worker.js'));
 }
+
 
