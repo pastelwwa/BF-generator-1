@@ -114,6 +114,15 @@ function render(){
     ctx.drawImage(sharpened,0,0);
   }
 
+  function updateBgButtons(){
+  const red = document.getElementById('bgRed');
+  const black = document.getElementById('bgBlack');
+  red.classList.remove('selected');
+  black.classList.remove('selected');
+  if (state.bgColor === '#FF0000') red.classList.add('selected');
+  else black.classList.add('selected');
+}
+
   // statyczne PNG
   if(state.nakladka) ctx.drawImage(state.nakladka,0,0,W,H);
   if(state.napis)    ctx.drawImage(state.napis,   0,0,W,H);
@@ -340,3 +349,4 @@ preload().then(()=>{ bindUI(); fitCanvasToViewport(); });
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=> navigator.serviceWorker.register('./service-worker.js'));
 }
+
