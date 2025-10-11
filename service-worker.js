@@ -1,4 +1,4 @@
-const CACHE = "bfgen-v9";
+const CACHE = "bfgen-v10";
 const ASSETS = [
   "./",
   "./index.html",
