@@ -24,9 +24,12 @@
     <div class="controls">
       <div class="group">
         <h2>Źródło zdjęcia</h2>
-        <label>Wybierz plik:
-          <input id="photoInput" type="file" accept="image/*">
-        </label>
+       <label>Wybierz plik:
+  <input id="photoInput" type="file" accept="image/*" class="file-hidden">
+  <button type="button" id="photoBtn">Załaduj zdjęcie</button>
+  <span id="photoName" class="muted"></span>
+</label>
+
         <label>Tło:
           <div class="row">
             <button id="bgRed">Czerwone</button>
