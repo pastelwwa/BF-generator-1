@@ -204,7 +204,15 @@ function saveJPG(){
 }
 
 // --- UI & Gesty & PWA ---
-function bindUI(){
+function bindUI()
+// w bindUI():
+el('photoBtn').addEventListener('click', ()=> el('photoInput').click());
+el('photoInput').addEventListener('change', e=>{
+  const f = e.target.files?.[0];
+  el('photoName').textContent = f ? f.name : '';
+  // (reszta Twojej logiki wczytywania zdjęcia już tam jest)
+}, { once:false });
+{
   // tło
   el('bgRed').addEventListener('click',()=>{ state.bgColor='#FF0000'; render(); });
   el('bgBlack').addEventListener('click',()=>{ state.bgColor='#000000'; render(); });
@@ -337,3 +345,4 @@ preload().then(()=>{ bindUI(); fitCanvasToViewport(); });
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=> navigator.serviceWorker.register('./service-worker.js'));
 }
+
