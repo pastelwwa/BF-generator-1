@@ -67,6 +67,17 @@ button:hover{background:#379fdc}
 button.danger{background:var(--danger)}button.danger:hover{background:#c0392b}
 button.ghost{background:transparent;color:var(--muted);border:1px dashed var(--muted)}button.ghost:hover{border-color:var(--fg);color:var(--fg)}
 button.tiny{font-size:12px;padding:6px 10px}
+/* Przełącznik tła: wybrany = ciemny, niewybrany = niebieski */
+.bg-toggle button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+}
+.bg-toggle button.selected {
+  background: #222;
+  color: #fff;
+  border: 1px solid #444;
+}
 
 /* podgląd: szara 50% podkładka */
 .preview{
@@ -97,3 +108,4 @@ button.tiny{font-size:12px;padding:6px 10px}
 @media (min-width:901px){
   #c{max-height:calc(100vh - 220px); width:auto; height:auto; max-width:100%}
 }
+
