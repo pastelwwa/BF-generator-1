@@ -68,7 +68,9 @@ function computeBaseScaleForImage(img){
 
 // --- Zawijanie tekstu: Enter + całe słowa ---
 function wrapParagraph(ctx, text, maxWidth){
-  const words=(text||'').trim().split(/\s+/); const lines=[]; let line='';
+  const t = (text||'').trim();
+  if(!t) return [];
+  const words=t.split(/\s+/); const lines=[]; let line='';
   for(const w of words){
     const test=line? (line+' '+w) : w;
     if(ctx.measureText(test).width <= maxWidth) line=test;
@@ -78,7 +80,8 @@ function wrapParagraph(ctx, text, maxWidth){
   return lines;
 }
 function wrapTextPreserveBreaks(ctx, text, maxWidth){
-  const paras=(text??'').split('\n'); const out=[];
+  if(!text) return [];
+  const paras=String(text).split('\n'); const out=[];
   for(const p of paras){
     const lines=wrapParagraph(ctx,p,maxWidth);
     if(lines.length===0) out.push(''); else out.push(...lines);
@@ -113,15 +116,6 @@ function render(){
     const sharpened = (state.sharp===100)? off : applySharpen(off, state.sharp);
     ctx.drawImage(sharpened,0,0);
   }
-
-  function updateBgButtons(){
-  const red = document.getElementById('bgRed');
-  const black = document.getElementById('bgBlack');
-  red.classList.remove('selected');
-  black.classList.remove('selected');
-  if (state.bgColor === '#FF0000') red.classList.add('selected');
-  else black.classList.add('selected');
-}
 
   // statyczne PNG
   if(state.nakladka) ctx.drawImage(state.nakladka,0,0,W,H);
@@ -199,7 +193,7 @@ async function preload(){
   }
 }
 
-// --- Zapis JPG (bez siatki) ---
+// --- Zapis JPG ---
 function saveJPG(){
   state._renderForExport=true; render(); state._renderForExport=false;
   const base=(el('outname').value||'wynik').replace(/[^a-zA-Z0-9_.-]/g,'_');
@@ -212,20 +206,28 @@ function saveJPG(){
   }, 'image/jpeg', 0.9);
 }
 
+// --- BG toggle wizualny ---
+function updateBgButtons(){
+  const red = document.getElementById('bgRed');
+  const black = document.getElementById('bgBlack');
+  red.classList.remove('selected');
+  black.classList.remove('selected');
+  if (state.bgColor === '#FF0000') red.classList.add('selected');
+  else black.classList.add('selected');
+}
+
 // --- UI & Gesty & PWA ---
 function bindUI(){
-  // przycisk do wyboru pliku
+  // przycisk wyboru pliku
   el('photoBtn').addEventListener('click', ()=> el('photoInput').click());
-updateBgButtons();
 
   // tło
-el('bgRed').addEventListener('click',()=>{
-  state.bgColor='#FF0000'; updateBgButtons(); render();
-});
-el('bgBlack').addEventListener('click',()=>{
-  state.bgColor='#000000'; updateBgButtons(); render();
-});
-
+  el('bgRed').addEventListener('click',()=>{
+    state.bgColor='#FF0000'; updateBgButtons(); render();
+  });
+  el('bgBlack').addEventListener('click',()=>{
+    state.bgColor='#000000'; updateBgButtons(); render();
+  });
 
   // foto
   el('photoInput').addEventListener('change', e=>{
@@ -268,11 +270,10 @@ el('bgBlack').addEventListener('click',()=>{
   el('resetAllBtn').addEventListener('click', ()=>{
     state.img=null; state.imgAngle=0; state.baseScale=1; state.zoomExtra=0; state.offx=0; state.offy=0;
     state.bright=100; state.sat=100; state.cont=100; state.sharp=100;
-    state.text1=""; state.text2=""; state.text3=""; state.showGrid=true; state.bgColor='#FF0000';updateBgButtons();
-
+    state.text1=""; state.text2=""; state.text3=""; state.showGrid=true; state.bgColor='#FF0000';
     ['zoomExtra','offx','offy','bright','sat','cont','sharp'].forEach(id=>el(id).value=(id==='zoomExtra'?0:(id==='offx'||id==='offy'?0:100)));
     el('text1').value=""; el('text2').value=""; if(LAYOUT==='M') el('text3').value="";
-    el('showGrid').checked=true; render();
+    el('showGrid').checked=true; updateBgButtons(); render();
   });
 
   el('checkBtn').addEventListener('click', ()=>{ preload().then(render); });
@@ -322,7 +323,8 @@ el('bgBlack').addEventListener('click',()=>{
   }, {passive:false});
   c.addEventListener('touchend', e=>{ e.preventDefault(); if(e.touches.length===0){ touchDragging=false; pinching=false; } }, {passive:false});
 
-  setupInstallButton();
+  // zainicjuj stan przełącznika tła
+  updateBgButtons();
 }
 
 // --- PWA install ---
@@ -350,11 +352,9 @@ window.addEventListener('resize', fitCanvasToViewport);
 window.addEventListener('orientationchange', fitCanvasToViewport);
 
 // --- Start ---
-preload().then(()=>{ bindUI(); fitCanvasToViewport(); });
+preload().then(()=>{ bindUI(); fitCanvasToViewport(); setupInstallButton(); });
 
 // --- SW ---
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=> navigator.serviceWorker.register('./service-worker.js'));
 }
-
-
