@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <link rel="preload" href="pliki/fonts/TT-Travels-Next-DemiBold.woff2" as="font" type="font/woff2" crossorigin fetchpriority="high">
-  <link rel="preload" href="pliki/fonts/TT-Commons-Medium.woff2" as="font" type="font/woff2" crossorigin>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Generator zdjęć 1081x1447</title>
@@ -12,6 +10,9 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="pliki/appicon.png">
+  <!-- PRELOAD fontów -->
+  <link rel="preload" href="pliki/fonts/TT-Travels-Next-DemiBold.woff2" as="font" type="font/woff2" crossorigin fetchpriority="high">
+  <link rel="preload" href="pliki/fonts/TT-Commons-Medium.woff2" as="font" type="font/woff2" crossorigin>
 </head>
 <body>
   <header>
@@ -84,7 +85,10 @@
     </div>
 
     <div class="preview">
-      <canvas id="c" width="1081" height="1447" aria-label="Podgląd"></canvas>
+      <!-- STAŁE PROPORCJE: wrapper pilnuje 1081:1447 -->
+      <div class="canvas-wrap">
+        <canvas id="c" width="1081" height="1447" aria-label="Podgląd"></canvas>
+      </div>
     </div>
   </main>
 
