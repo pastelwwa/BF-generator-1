@@ -180,14 +180,14 @@ async function preload(){
     state.ramka=ramka; state.nakladka=nakladka; state.napis=napis;
     state.maskBBox=computeMaskBBox(ramka);
 
-    await Promise.allSettled([
-      document.fonts.load(`${FONT1_PX}px "TT-Travels-Next-DemiBold"`),
-      document.fonts.load(`${FONT2_PX}px "TT-Commons-Medium"`),
-      document.fonts.ready
-    ]);
+    // render od razu na fallbacku (Arial), fonty dojadą asynchronicznie
+el('status').textContent='Zasoby OK. Wczytaj zdjęcie.';
+render();
 
-    el('status').textContent='Zasoby OK. Wczytaj zdjęcie.';
-    render();
+// „dograj” fonty w tle i po każdym z nich odśwież podgląd
+document.fonts.load(`${FONT1_PX}px "TT-Travels-Next-DemiBold"`).then(()=> render()).catch(()=>{});
+document.fonts.load(`${FONT2_PX}px "TT-Commons-Medium"`).then(()=> render()).catch(()=>{});
+
   }catch(e){
     el('status').textContent='Błąd ładowania zasobów: '+e;
   }
@@ -353,8 +353,15 @@ window.addEventListener('orientationchange', fitCanvasToViewport);
 
 // --- Start ---
 preload().then(()=>{ bindUI(); fitCanvasToViewport(); setupInstallButton(); });
+// mała „rozgrzewka” – minimalne użycie fontów, żeby szybciej trafiły do cache
+setTimeout(() => {
+  document.fonts.load('12px "TT-Travels-Next-DemiBold"');
+  document.fonts.load('12px "TT-Commons-Medium"');
+}, 0);
+
 
 // --- SW ---
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=> navigator.serviceWorker.register('./service-worker.js'));
 }
+
