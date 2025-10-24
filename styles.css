@@ -32,7 +32,7 @@ footer{font-size:12px;color:var(--muted);gap:12px;flex-wrap:wrap}
 footer .credit{margin-left:auto;opacity:.7}
 footer .row{display:flex;gap:8px}
 
-/* layout: lewa kolumna minimalnie węższa, by wszystko się mieściło */
+/* layout: lewa kolumna minimalnie węższa */
 main{
   display:grid;grid-template-columns:320px 1fr;
   gap:20px;height:calc(100% - 80px);padding:16px;box-sizing:border-box
@@ -61,13 +61,6 @@ main{
 /* rzędy przycisków */
 .controls .row{display:flex;gap:8px;flex-wrap:wrap}
 
-/* przyciski */
-button{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px 14px;font-size:14px;cursor:pointer;transition:background .2s}
-button:hover{background:#379fdc}
-button.danger{background:var(--danger)}button.danger:hover{background:#c0392b}
-button.ghost{background:transparent;color:var(--muted);border:1px dashed var(--muted)}button.ghost:hover{border-color:var(--fg);color:var(--fg)}
-button.tiny{font-size:12px;padding:6px 10px}
-
 /* przełącznik tła: wybrany = ciemny, niewybrany = niebieski */
 .bg-toggle button { background: var(--accent); color:#fff; border:none; }
 .bg-toggle button.selected { background:#222; color:#fff; border:1px solid #444; }
@@ -77,7 +70,23 @@ button.tiny{font-size:12px;padding:6px 10px}
   display:flex;flex-direction:column;align-items:center;
   background:#808080; padding:8px; border-radius:8px;
 }
-#c{background:#333;border-radius:12px;max-width:100%;height:auto;display:block;touch-action:none}
+
+/* STAŁE PROPORCJE PODGLĄDU: 1081:1447 */
+.canvas-wrap{
+  width:100%;
+  max-width:100%;
+  aspect-ratio: 1081 / 1447;  /* pilnujemy proporcji */
+  /* wymiary faktyczne ustawia JS (fitCanvasToViewport), tu trzymamy ratio */
+  position:relative;
+}
+#c{
+  width:100%;
+  height:100%;
+  display:block;
+  background:#333;
+  border-radius:12px;
+  touch-action:none;
+}
 
 /* zapis */
 .save-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -89,7 +98,6 @@ button.tiny{font-size:12px;padding:6px 10px}
 @media (max-width:900px){
   main{display:flex;flex-direction:column;gap:12px;padding:12px;height:auto}
   .preview{order:-1;padding:6px}
-  #c{width:100%;height:auto;max-width:100%}
   .controls .group{padding:10px}
   .controls .group label{grid-template-columns:120px 1fr}
   .controls textarea{min-height:80px;font-size:16px}
@@ -97,7 +105,4 @@ button.tiny{font-size:12px;padding:6px 10px}
   .controls .save-row{position:sticky;bottom:8px;background:linear-gradient(180deg,transparent,var(--bg) 30%);padding-top:8px;z-index:10}
 }
 
-/* desktop – canvas nie większy niż okno */
-@media (min-width:901px){
-  #c{max-height:calc(100vh - 220px); width:auto; height:auto; max-width:100%}
-}
+/* (usuwamy wcześniejsze ograniczanie #c rozmiarem okna — teraz robi to wrapper) */
