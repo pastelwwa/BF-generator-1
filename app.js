@@ -66,7 +66,7 @@ function computeBaseScaleForImage(img){
   const {w:mw,h:mh}=state.maskBBox; return Math.max(mw/iw, mh/ih);
 }
 
-// --- Zawijanie tekstu: Enter + całe słowa ---
+// --- Zawijanie tekstu ---
 function wrapParagraph(ctx, text, maxWidth){
   const t = (text||'').trim();
   if(!t) return [];
@@ -180,14 +180,12 @@ async function preload(){
     state.ramka=ramka; state.nakladka=nakladka; state.napis=napis;
     state.maskBBox=computeMaskBBox(ramka);
 
-    // render od razu na fallbacku (Arial), fonty dojadą asynchronicznie
-el('status').textContent='Zasoby OK. Wczytaj zdjęcie.';
-render();
+    // renderuj od razu (fallback font), fonty dociągną się w tle
+    document.fonts.load(`${FONT1_PX}px "TT-Travels-Next-DemiBold"`).then(()=>render());
+    document.fonts.load(`${FONT2_PX}px "TT-Commons-Medium"`).then(()=>render());
 
-// „dograj” fonty w tle i po każdym z nich odśwież podgląd
-document.fonts.load(`${FONT1_PX}px "TT-Travels-Next-DemiBold"`).then(()=> render()).catch(()=>{});
-document.fonts.load(`${FONT2_PX}px "TT-Commons-Medium"`).then(()=> render()).catch(()=>{});
-
+    el('status').textContent='Zasoby OK. Wczytaj zdjęcie.';
+    render();
   }catch(e){
     el('status').textContent='Błąd ładowania zasobów: '+e;
   }
@@ -327,6 +325,42 @@ function bindUI(){
   updateBgButtons();
 }
 
+// --- Canvas fit do viewportu z twardym ratio 1081:1447 ---
+function fitCanvasToViewport(){
+  const wrap = document.querySelector('.canvas-wrap');
+  const preview = document.querySelector('.preview');
+  const pad = 16; // trochę luzu
+
+  const availW = preview.clientWidth - pad;
+  const headerH = document.querySelector('header').offsetHeight;
+  const footerH = document.querySelector('footer').offsetHeight;
+  const availH = window.innerHeight - headerH - footerH - pad;
+
+  // proporcje: W×H (1081×1447)
+  const ratio = H / W;
+  // dobierz szerokość tak, by zmieścić się i na szerokość, i na wysokość
+  const targetW = Math.min(availW, availH / ratio);
+  const targetH = targetW * ratio;
+
+  wrap.style.width  = `${targetW}px`;
+  wrap.style.height = `${targetH}px`;
+}
+
+window.addEventListener('resize', fitCanvasToViewport);
+window.addEventListener('orientationchange', fitCanvasToViewport);
+
+// --- Start ---
+preload().then(()=>{
+  bindUI();
+  fitCanvasToViewport();
+  // rozgrzewka fontów
+  setTimeout(()=> {
+    document.fonts.load('12px "TT-Travels-Next-DemiBold"');
+    document.fonts.load('12px "TT-Commons-Medium"');
+  },0);
+  setupInstallButton();
+});
+
 // --- PWA install ---
 let deferredPrompt=null;
 function setupInstallButton(){
@@ -338,30 +372,7 @@ function setupInstallButton(){
   });
 }
 
-// --- Canvas fit do viewportu (desktop) ---
-function fitCanvasToViewport(){
-  const preview=document.querySelector('.preview'), pad=24;
-  const availW=preview.clientWidth-pad;
-  const headerH=document.querySelector('header').offsetHeight;
-  const footerH=document.querySelector('footer').offsetHeight;
-  const availH=window.innerHeight-headerH-footerH-pad;
-  const scale=Math.min(availW/W, availH/H, 1);
-  c.style.width=(W*scale)+'px'; c.style.height=(H*scale)+'px';
-}
-window.addEventListener('resize', fitCanvasToViewport);
-window.addEventListener('orientationchange', fitCanvasToViewport);
-
-// --- Start ---
-preload().then(()=>{ bindUI(); fitCanvasToViewport(); setupInstallButton(); });
-// mała „rozgrzewka” – minimalne użycie fontów, żeby szybciej trafiły do cache
-setTimeout(() => {
-  document.fonts.load('12px "TT-Travels-Next-DemiBold"');
-  document.fonts.load('12px "TT-Commons-Medium"');
-}, 0);
-
-
 // --- SW ---
 if('serviceWorker' in navigator){
   window.addEventListener('load', ()=> navigator.serviceWorker.register('./service-worker.js'));
 }
-
