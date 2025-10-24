@@ -1,4 +1,4 @@
-const CACHE = "bfgen-v12";
+const CACHE = "bfgen-v13";
 const ASSETS = [
   "./",
   "./index.html",
@@ -30,4 +30,3 @@ self.addEventListener("activate", e=>{
 self.addEventListener("fetch", e=>{
   e.respondWith(caches.match(e.request).then(r=> r || fetch(e.request)));
 });
-
