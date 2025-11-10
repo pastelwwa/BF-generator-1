@@ -106,3 +106,39 @@ main{
 }
 
 /* (usuwamy wcześniejsze ograniczanie #c rozmiarem okna — teraz robi to wrapper) */
+
+/* NAKŁADKA ŁADOWANIA */
+#loaderOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.92);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+.loader-box{
+  text-align:center;
+  padding:20px 28px;
+  border-radius:12px;
+  background:#111;
+  box-shadow:0 8px 24px rgba(0,0,0,0.6);
+  font-family:"Segoe UI",sans-serif;
+  color:#fff;
+}
+.spinner{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  border:3px solid #4cafef;
+  border-top-color:transparent;
+  margin:0 auto 10px;
+  animation:spin .8s linear infinite;
+}
+.loader-text{
+  font-size:14px;
+  color:#ddd;
+}
+@keyframes spin{
+  to{ transform:rotate(360deg); }
+}
