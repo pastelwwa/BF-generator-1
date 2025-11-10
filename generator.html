@@ -15,6 +15,14 @@
   <link rel="preload" href="pliki/fonts/TT-Commons-Medium.woff2" as="font" type="font/woff2" crossorigin>
 </head>
 <body>
+  <!-- NAKŁADKA ŁADOWANIA -->
+  <div id="loaderOverlay">
+    <div class="loader-box">
+      <div class="spinner"></div>
+      <div class="loader-text">Przygotowuję generator...</div>
+    </div>
+  </div>
+
   <header>
     <div class="left">
       <a class="back" href="index.html" title="Powrót">←</a>
@@ -30,7 +38,7 @@
 
         <label>Plik:
           <input id="photoInput" type="file" accept="image/*" class="file-hidden">
-          <button type="button" id="photoBtn">Załaduj zdjęcie</button>
+          <button type="button" id="photoBtn" disabled>Załaduj zdjęcie</button>
         </label>
 
         <label>Tło:
@@ -78,14 +86,13 @@
         <label>Nazwa pliku:
           <input id="outname" value="wynik">
         </label>
-        <button id="saveJpgBtn">Zapisz JPG</button>
+        <button id="saveJpgBtn" disabled>Zapisz JPG</button>
       </div>
 
       <button id="resetAllBtn" class="danger">Reset wszystkiego</button>
     </div>
 
     <div class="preview">
-      <!-- STAŁE PROPORCJE: wrapper pilnuje 1081:1447 -->
       <div class="canvas-wrap">
         <canvas id="c" width="1081" height="1447" aria-label="Podgląd"></canvas>
       </div>
