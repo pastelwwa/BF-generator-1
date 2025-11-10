@@ -2,7 +2,6 @@
 const W = 1081, H = 1447;
 const c = document.getElementById("c");
 const ctx = c.getContext("2d");
-
 const loaderOverlay = document.getElementById("loaderOverlay");
 
 // --- Fonty / interlinia ---
@@ -17,7 +16,9 @@ const LH3 = Math.round(FONT3_PX * 1.15);
 const params = new URLSearchParams(location.search);
 const LAYOUT = (params.get('layout') || 'D').toUpperCase();
 const layoutTitle = document.getElementById('layoutTitle');
-layoutTitle.textContent = (LAYOUT === 'M') ? 'Generator z małym zdjęciem' : 'Generator z dużym zdjęciem';
+layoutTitle.textContent = (LAYOUT === 'M')
+  ? 'Generator z małym zdjęciem'
+  : 'Generator z dużym zdjęciem';
 if (LAYOUT === 'M') document.getElementById('smallTextRow').style.display = '';
 
 const el = id => document.getElementById(id);
@@ -34,30 +35,25 @@ const state = {
   maskBBox:{x:0,y:0,w:W,h:H}, _renderForExport:false
 };
 
-// --- Loader logika ---
-let appReady = false;
-let minDelayPassed = false;
-const MIN_LOADER_MS = 5000;
-
-setTimeout(() => {
-  minDelayPassed = true;
-  if (appReady) hideLoader();
-}, MIN_LOADER_MS);
-
-function hideLoader() {
+// --- Helpers ---
+function hideLoader(){
   if (loaderOverlay) loaderOverlay.style.display = 'none';
-  // odblokuj kluczowe przyciski
-  const photoBtn = el('photoBtn');
-  const saveBtn = el('saveJpgBtn');
-  if (photoBtn) photoBtn.disabled = false;
-  if (saveBtn) saveBtn.disabled = false;
 }
 
-// --- Helpers ---
-function loadImage(src){ return new Promise((res,rej)=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=src; }); }
+function loadImage(src){
+  return new Promise((res,rej)=>{
+    const i=new Image();
+    i.onload=()=>res(i);
+    i.onerror=rej;
+    i.src=src;
+  });
+}
+
 function computeMaskBBox(maskImg){
-  const off=document.createElement('canvas'); off.width=W; off.height=H;
-  const octx=off.getContext('2d'); octx.drawImage(maskImg,0,0,W,H);
+  const off=document.createElement('canvas');
+  off.width=W; off.height=H;
+  const octx=off.getContext('2d');
+  octx.drawImage(maskImg,0,0,W,H);
   const img=octx.getImageData(0,0,W,H), d=img.data;
   let minx=W, miny=H, maxx=-1, maxy=-1;
   for(let y=0;y<H;y++){
@@ -74,6 +70,7 @@ function computeMaskBBox(maskImg){
   if(maxx<minx) return {x:0,y:0,w:W,h:H};
   return {x:minx,y:miny,w:maxx-minx+1,h:maxy-miny+1};
 }
+
 function applySharpen(srcCanvas, amountPct){
   const amount=Math.max(0,Math.min(2,amountPct/100));
   if(amount===1) return srcCanvas;
@@ -86,9 +83,15 @@ function applySharpen(srcCanvas, amountPct){
       const idx=(y*w+x)*4;
       for(let ch=0;ch<3;ch++){
         let acc=0;
-        acc+=sd[idx-row-4+ch]*k[0]; acc+=sd[idx-row  +ch]*k[1]; acc+=sd[idx-row+4+ch]*k[2];
-        acc+=sd[idx-4    +ch]*k[3]; acc+=sd[idx      +ch]*k[4]; acc+=sd[idx+4    +ch]*k[5];
-        acc+=sd[idx+row-4+ch]*k[6]; acc+=sd[idx+row  +ch]*k[7]; acc+=sd[idx+row+4+ch]*k[8];
+        acc+=sd[idx-row-4+ch]*k[0];
+        acc+=sd[idx-row  +ch]*k[1];
+        acc+=sd[idx-row+4+ch]*k[2];
+        acc+=sd[idx-4    +ch]*k[3];
+        acc+=sd[idx      +ch]*k[4];
+        acc+=sd[idx+4    +ch]*k[5];
+        acc+=sd[idx+row-4+ch]*k[6];
+        acc+=sd[idx+row  +ch]*k[7];
+        acc+=sd[idx+row+4+ch]*k[8];
         dd[idx+ch]=Math.max(0,Math.min(255,acc));
       }
       dd[idx+3]=sd[idx+3];
@@ -97,30 +100,40 @@ function applySharpen(srcCanvas, amountPct){
   sctx.putImageData(dst,0,0);
   return srcCanvas;
 }
+
 function computeBaseScaleForImage(img){
   const ang=state.imgAngle%4;
   const iw=(ang%2===0)?img.width:img.height;
   const ih=(ang%2===0)?img.height:img.width;
   const {w:mw,h:mh}=state.maskBBox;
+  // zawsze min. wypełnienie ramki (bez pustych pól)
   return Math.max(mw/iw, mh/ih);
 }
 
 // --- Zawijanie tekstu ---
 function wrapParagraph(ctx, text, maxWidth){
-  const t = (text||'').trim();
+  const t=(text||'').trim();
   if(!t) return [];
-  const words=t.split(/\s+/); const lines=[]; let line='';
+  const words=t.split(/\s+/);
+  const lines=[];
+  let line='';
   for(const w of words){
-    const test=line? (line+' '+w) : w;
-    if(ctx.measureText(test).width <= maxWidth) line=test;
-    else { if(line) lines.push(line); line=w; }
+    const test=line ? (line+' '+w) : w;
+    if(ctx.measureText(test).width <= maxWidth){
+      line=test;
+    }else{
+      if(line) lines.push(line);
+      line=w;
+    }
   }
   if(line) lines.push(line);
   return lines;
 }
+
 function wrapTextPreserveBreaks(ctx, text, maxWidth){
   if(!text) return [];
-  const paras=String(text).split('\n'); const out=[];
+  const paras=String(text).split('\n');
+  const out=[];
   for(const p of paras){
     const lines=wrapParagraph(ctx,p,maxWidth);
     if(lines.length===0) out.push('');
@@ -136,7 +149,8 @@ function render(){
 
   // zdjęcie + maska
   if(state.img && state.ramka){
-    const off=document.createElement('canvas'); off.width=W; off.height=H;
+    const off=document.createElement('canvas');
+    off.width=W; off.height=H;
     const octx=off.getContext('2d');
     octx.filter=`brightness(${state.bright/100}) saturate(${state.sat/100}) contrast(${state.cont/100})`;
 
@@ -155,7 +169,7 @@ function render(){
 
     octx.globalCompositeOperation='destination-in';
     octx.drawImage(state.ramka,0,0,W,H);
-    const sharpened = (state.sharp===100)? off : applySharpen(off, state.sharp);
+    const sharpened=(state.sharp===100)?off:applySharpen(off,state.sharp);
     ctx.drawImage(sharpened,0,0);
   }
 
@@ -168,35 +182,35 @@ function render(){
   ctx.textAlign="left";
   ctx.textBaseline="alphabetic";
 
-  // DUŻY
-  const useF1 = document.fonts.check(`${FONT1_PX}px "TT-Travels-Next-DemiBold"`);
-  ctx.font = `${FONT1_PX}px ${useF1?'"TT-Travels-Next-DemiBold"':'Arial'}, sans-serif`;
+  // DUŻY – TT Travels
+  const useF1=document.fonts.check(`${FONT1_PX}px "TT-Travels-Next-DemiBold"`);
+  ctx.font=`${FONT1_PX}px ${useF1?'"TT-Travels-Next-DemiBold"':'Arial'}, sans-serif`;
   const left1=70, maxWidth1=W-left1*2;
-  const lines1 = wrapTextPreserveBreaks(ctx, (state.text1||'').toUpperCase(), maxWidth1);
+  const lines1=wrapTextPreserveBreaks(ctx,(state.text1||'').toUpperCase(),maxWidth1);
   for(let i=0;i<lines1.length;i++){
-    const y = (LAYOUT==='D'?1154:189) - i*LH1;
-    ctx.fillText(lines1[lines1.length-1-i], left1, y);
+    const y=(LAYOUT==='D'?1154:189) - i*LH1;
+    ctx.fillText(lines1[lines1.length-1-i],left1,y);
   }
 
-  // MAŁY
-  const useF2 = document.fonts.check(`${FONT2_PX}px "TT-Commons-Medium"`);
-  ctx.font = `${FONT2_PX}px ${useF2?'"TT-Commons-Medium"':'Arial'}, sans-serif`;
+  // MAŁY – TT Commons
+  const useF2=document.fonts.check(`${FONT2_PX}px "TT-Commons-Medium"`);
+  ctx.font=`${FONT2_PX}px ${useF2?'"TT-Commons-Medium"':'Arial'}, sans-serif`;
   const left2=75, maxWidth2=W-left2*2;
-  const lines2 = wrapTextPreserveBreaks(ctx, state.text2||'', maxWidth2);
+  const lines2=wrapTextPreserveBreaks(ctx,state.text2||'',maxWidth2);
   for(let i=0;i<lines2.length;i++){
-    const y = (LAYOUT==='D'?1201:236) + i*LH2;
-    ctx.fillText(lines2[i], left2, y);
+    const y=(LAYOUT==='D'?1201:236) + i*LH2;
+    ctx.fillText(lines2[i],left2,y);
   }
 
-  // MNIEJSZY (M)
+  // MNIEJSZY – tylko M
   if(LAYOUT==='M'){
-    const useF3 = document.fonts.check(`${FONT3_PX}px "TT-Commons-Medium"`);
-    ctx.font = `${FONT3_PX}px ${useF3?'"TT-Commons-Medium"':'Arial'}, sans-serif`;
+    const useF3=document.fonts.check(`${FONT3_PX}px "TT-Commons-Medium"`);
+    ctx.font=`${FONT3_PX}px ${useF3?'"TT-Commons-Medium"':'Arial'}, sans-serif`;
     const left3=75, maxWidth3=570-left3;
-    const lines3 = wrapTextPreserveBreaks(ctx, state.text3||'', maxWidth3);
+    const lines3=wrapTextPreserveBreaks(ctx,state.text3||'',maxWidth3);
     for(let i=0;i<lines3.length;i++){
-      const y = 366 + i*LH3;
-      ctx.fillText(lines3[i], left3, y);
+      const y=366 + i*LH3;
+      ctx.fillText(lines3[i],left3,y);
     }
   }
 
@@ -207,13 +221,13 @@ function render(){
     ctx.beginPath();
     ctx.moveTo(W/3,0); ctx.lineTo(W/3,H);
     ctx.moveTo(2*W/3,0); ctx.lineTo(2*W/3,H);
-    ctx.moveTo(0,H/3); ctx.lineTo(W,H/3);
+    ctx.moveTo(0,H/3);   ctx.lineTo(W,H/3);
     ctx.moveTo(0,2*H/3); ctx.lineTo(W,2*H/3);
     ctx.stroke();
   }
 }
 
-// --- Preload zasobów + powiązanie z loaderem ---
+// --- Preload zasobów (blokuje loader tylko do realnego końca) ---
 async function preload(){
   try{
     const base='pliki/', p=LAYOUT+'_';
@@ -228,23 +242,18 @@ async function preload(){
     state.napis=napis;
     state.maskBBox=computeMaskBBox(ramka);
 
-    // startowo jakiś render (fallback font)
     el('status').textContent='Zasoby OK. Wczytaj zdjęcie.';
     render();
 
-    // fonty dogrywamy w tle (bez blokowania)
+    // fonty łapiemy w tle (nie blokują)
     document.fonts.load(`${FONT1_PX}px "TT-Travels-Next-DemiBold"`).then(()=>render()).catch(()=>{});
     document.fonts.load(`${FONT2_PX}px "TT-Commons-Medium"`).then(()=>render()).catch(()=>{});
 
-    // Po preloadzie oznaczamy, że aplikacja gotowa
-    appReady = true;
-    if (minDelayPassed) hideLoader();
-
+    hideLoader();
   }catch(e){
     el('status').textContent='Błąd ładowania zasobów: '+e;
-    // nawet przy błędzie zdejmijmy loader, by nie blokować
-    appReady = true;
-    if (minDelayPassed) hideLoader();
+    // zdejmij loader, żeby nie blokować
+    hideLoader();
   }
 }
 
@@ -253,6 +262,7 @@ function saveJPG(){
   state._renderForExport=true;
   render();
   state._renderForExport=false;
+
   const base=(el('outname').value||'wynik').replace(/[^a-zA-Z0-9_.-]/g,'_');
   c.toBlob(blob=>{
     const a=document.createElement('a');
@@ -276,15 +286,8 @@ function updateBgButtons(){
 
 // --- UI & gesty ---
 function bindUI(){
+  // file
   el('photoBtn').addEventListener('click', ()=> el('photoInput').click());
-
-  el('bgRed').addEventListener('click',()=>{
-    state.bgColor='#FF0000'; updateBgButtons(); render();
-  });
-  el('bgBlack').addEventListener('click',()=>{
-    state.bgColor='#000000'; updateBgButtons(); render();
-  });
-
   el('photoInput').addEventListener('change', e=>{
     const f=e.target.files?.[0]; if(!f) return;
     const url=URL.createObjectURL(f);
@@ -302,16 +305,27 @@ function bindUI(){
     img.src=url;
   });
 
+  // tło
+  el('bgRed').addEventListener('click',()=>{
+    state.bgColor='#FF0000'; updateBgButtons(); render();
+  });
+  el('bgBlack').addEventListener('click',()=>{
+    state.bgColor='#000000'; updateBgButtons(); render();
+  });
+
+  // suwaki
   el('zoomExtra').addEventListener('input', e=>{ state.zoomExtra=+e.target.value; render(); });
   ['offx','offy','bright','sat','cont','sharp'].forEach(id=>{
     el(id).addEventListener('input', e=>{ state[id]=+e.target.value; render(); });
   });
 
+  // teksty
   el('text1').addEventListener('input', e=>{ state.text1=e.target.value; render(); });
   el('text2').addEventListener('input', e=>{ state.text2=e.target.value; render(); });
   if(LAYOUT==='M') el('text3').addEventListener('input', e=>{ state.text3=e.target.value; render(); });
   el('showGrid').addEventListener('change', e=>{ state.showGrid=e.target.checked; render(); });
 
+  // przyciski
   el('saveJpgBtn').addEventListener('click', saveJPG);
 
   el('autoFitBtn').addEventListener('click', ()=>{
@@ -354,8 +368,10 @@ function bindUI(){
   el('checkBtn').addEventListener('click', ()=>{ preload().then(render); });
 
   el('fullscreenBtn').addEventListener('click', ()=>{
-    if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(console.error);
-    else document.exitFullscreen();
+    if(!document.fullscreenElement)
+      document.documentElement.requestFullscreen().catch(console.error);
+    else
+      document.exitFullscreen();
   });
 
   // drag mysz
@@ -369,11 +385,12 @@ function bindUI(){
     const scaleX=W/c.clientWidth, scaleY=H/c.clientHeight;
     state.offx=Math.round(bx+(e.offsetX-sx)*scaleX);
     state.offy=Math.round(by+(e.offsetY-sy)*scaleY);
-    el('offx').value=state.offx; el('offy').value=state.offy;
+    el('offx').value=state.offx;
+    el('offy').value=state.offy;
     render();
   });
 
-  // zoom kółkiem
+  // scroll = zoom
   c.addEventListener('wheel', e=>{
     e.preventDefault();
     state.zoomExtra=Math.max(0,Math.min(200,state.zoomExtra+(e.deltaY<0?5:-5)));
@@ -381,7 +398,7 @@ function bindUI(){
     render();
   }, {passive:false});
 
-  // dotyk: przesuwanie + pinch zoom
+  // dotyk
   let touchDragging=false,startX=0,startY=0,baseOffX=0,baseOffY=0;
   let pinching=false,startDist=0,baseZoomExtra=0;
   function dist(t1,t2){ return Math.hypot(t2.clientX-t1.clientX,t2.clientY-t1.clientY); }
@@ -390,8 +407,10 @@ function bindUI(){
     e.preventDefault();
     if(e.touches.length===1){
       touchDragging=true; pinching=false;
-      startX=e.touches[0].clientX; startY=e.touches[0].clientY;
-      baseOffX=state.offx; baseOffY=state.offy;
+      startX=e.touches[0].clientX;
+      startY=e.touches[0].clientY;
+      baseOffX=state.offx;
+      baseOffY=state.offy;
     }else if(e.touches.length===2){
       pinching=true; touchDragging=false;
       startDist=dist(e.touches[0],e.touches[1]);
@@ -407,7 +426,8 @@ function bindUI(){
       const scaleX=W/c.clientWidth, scaleY=H/c.clientHeight;
       state.offx=Math.round(baseOffX+dx*scaleX);
       state.offy=Math.round(baseOffY+dy*scaleY);
-      el('offx').value=state.offx; el('offy').value=state.offy;
+      el('offx').value=state.offx;
+      el('offy').value=state.offy;
       render();
     }else if(pinching && e.touches.length===2){
       const d=dist(e.touches[0],e.touches[1]);
@@ -426,24 +446,24 @@ function bindUI(){
   updateBgButtons();
 }
 
-// --- Canvas fit z zachowaniem proporcji (wrapper .canvas-wrap) ---
+// --- Canvas fit (stałe proporcje, .canvas-wrap) ---
 function fitCanvasToViewport(){
-  const wrap = document.querySelector('.canvas-wrap');
+  const wrap=document.querySelector('.canvas-wrap');
   if(!wrap) return;
-  const preview = document.querySelector('.preview');
-  const pad = 16;
+  const preview=document.querySelector('.preview');
+  const pad=16;
 
-  const availW = preview.clientWidth - pad;
-  const headerH = document.querySelector('header').offsetHeight;
-  const footerH = document.querySelector('footer').offsetHeight;
-  const availH = window.innerHeight - headerH - footerH - pad;
+  const availW=preview.clientWidth - pad;
+  const headerH=document.querySelector('header').offsetHeight;
+  const footerH=document.querySelector('footer').offsetHeight;
+  const availH=window.innerHeight - headerH - footerH - pad;
 
-  const ratio = H / W;
-  const targetW = Math.min(availW, availH / ratio);
-  const targetH = targetW * ratio;
+  const ratio=H/W;
+  const targetW=Math.min(availW, availH/ratio);
+  const targetH=targetW*ratio;
 
-  wrap.style.width  = `${targetW}px`;
-  wrap.style.height = `${targetH}px`;
+  wrap.style.width = targetW+'px';
+  wrap.style.height= targetH+'px';
 }
 
 window.addEventListener('resize', fitCanvasToViewport);
@@ -453,11 +473,6 @@ window.addEventListener('orientationchange', fitCanvasToViewport);
 preload().then(()=>{
   bindUI();
   fitCanvasToViewport();
-  // rozgrzewka fontów
-  setTimeout(()=>{
-    document.fonts.load('12px "TT-Travels-Next-DemiBold"');
-    document.fonts.load('12px "TT-Commons-Medium"');
-  },0);
   setupInstallButton();
 });
 
@@ -465,7 +480,10 @@ preload().then(()=>{
 let deferredPrompt=null;
 function setupInstallButton(){
   const btn=el('installBtn');
-  window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); deferredPrompt=e; });
+  window.addEventListener('beforeinstallprompt', (e)=>{
+    e.preventDefault();
+    deferredPrompt=e;
+  });
   btn.addEventListener('click', async ()=>{
     if(deferredPrompt){
       deferredPrompt.prompt();
